@@ -1,0 +1,13 @@
+services:
+  donat-app:
+    build: .
+    container_name: donat-app
+    restart: always
+    environment:
+      - PORT=3000
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true
