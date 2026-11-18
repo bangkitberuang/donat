@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DONAT • donat.bangkit.io</title>
+  <meta name="description" content="DONAT (Download and Convert) - Unduh video dan audio MP3 dari YouTube, TikTok, dan Instagram.">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased min-h-screen flex flex-col justify-between p-4 sm:p-8 font-sans selection:bg-emerald-500">
+
+  <!-- Header -->
+  <header class="max-w-xl mx-auto w-full flex items-center justify-between pb-4 border-b border-zinc-800">
+    <div class="flex items-center gap-3">
+      <img src="/logo.png" alt="DONAT Logo" class="w-8 h-8 rounded-lg object-contain">
+      <div>
+        <span class="font-bold text-sm text-white tracking-tight">DONAT</span>
+        <span class="text-xs text-zinc-400 block font-mono">donat.bangkit.io</span>
+      </div>
+    </div>
+    <span class="text-xs text-zinc-400 font-mono">v1.0</span>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-xl mx-auto w-full my-auto py-8 space-y-6">
+
+    <!-- Title Section -->
+    <section class="space-y-1">
+      <h1 class="text-2xl sm:text-3xl font-semibold text-white tracking-tight">Download &amp; Convert</h1>
+      <p class="text-xs sm:text-sm text-zinc-400">Unduh video dan ekstrak audio dari YouTube, TikTok, atau Instagram.</p>
+    </section>
+
+    <!-- Input Section -->
+    <section class="space-y-3">
+      <div class="flex gap-2">
+        <input 
+          id="urlInput"
+          type="url" 
+          placeholder="Tempel tautan video di sini..."
+          class="flex-1 px-3.5 py-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors"
+          autocomplete="off"
+          autocapitalize="off"
+        />
+        <button 
+          id="fetchBtn" 
+          class="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white transition-colors cursor-pointer shrink-0 flex items-center gap-2"
+        >
+          <span id="fetchText">Proses</span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-zinc-400">
+        <span id="pasteBtn" class="hover:text-zinc-200 cursor-pointer underline">Tempel dari papan klip</span>
+        <span class="text-zinc-500">Berkas terunduh langsung ke perangkat</span>
+      </div>
+    </section>
+
+    <!-- Error Box -->
+    <div id="errorBox" class="hidden p-3 rounded-lg bg-red-950/40 border border-red-800/60 text-red-300 text-xs">
+      <span id="errorText">Tautan tidak valid atau tidak dapat diproses.</span>
+    </div>
+
+    <!-- Active Media Card -->
+    <section id="mediaCard" class="hidden p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-4">
+      
+      <!-- Media Info -->
+      <div class="flex gap-3.5 items-start">
+        <div class="relative w-28 aspect-video rounded-md overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
+          <img id="mediaThumbnail" src="" alt="Thumbnail" class="w-full h-full object-cover">
+          <span id="mediaDuration" class="absolute bottom-1 right-1 px-1 py-0.2 rounded bg-black/80 font-mono text-[9px] text-zinc-200">00:00</span>
+        </div>
+        <div class="min-w-0 flex-1 space-y-1">
+          <span id="platformBadge" class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">Video</span>
+          <h2 id="mediaTitle" class="text-xs sm:text-sm font-medium text-zinc-100 line-clamp-2 leading-snug">
+            Judul Video
+          </h2>
+          <p id="authorText" class="text-[11px] text-zinc-400 truncate">-</p>
+        </div>
+      </div>
+
+      <!-- Format Switcher -->
+      <div class="space-y-3">
+        <div class="flex border-b border-zinc-800 text-xs">
+          <button id="tabVideo" onclick="switchTab('video')" class="pb-2 px-3 font-medium text-white border-b-2 border-emerald-500 transition-all">
+            Video (MP4)
+          </button>
+          <button id="tabAudio" onclick="switchTab('audio')" class="pb-2 px-3 font-medium text-zinc-400 hover:text-zinc-200 border-b-2 border-transparent transition-all">
+            Audio (MP3)
+          </button>
+        </div>
+
+        <!-- Video Options -->
+        <div id="panelVideo" class="space-y-1.5">
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-white font-medium w-12">1080p</span>
+              <span class="text-xs text-zinc-400">Full HD</span>
+            </div>
+            <button onclick="downloadMedia('video', '1080p')" class="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs transition-colors cursor-pointer">
+              Unduh
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-white font-medium w-12">720p</span>
+              <span class="text-xs text-zinc-400">HD</span>
+            </div>
+            <button onclick="downloadMedia('video', '720p')" class="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs transition-colors cursor-pointer">
+              Unduh
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-white font-medium w-12">480p</span>
+              <span class="text-xs text-zinc-400">SD</span>
+            </div>
+            <button onclick="downloadMedia('video', '480p')" class="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs transition-colors cursor-pointer">
+              Unduh
+            </button>
+          </div>
+        </div>
+
+        <!-- Audio Options -->
+        <div id="panelAudio" class="space-y-1.5 hidden">
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-emerald-400 font-medium w-16">320 kbps</span>
+              <span class="text-xs text-zinc-400">Kualitas Maksimal</span>
+            </div>
+            <button onclick="downloadMedia('audio', '320k')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-colors cursor-pointer">
+              Unduh MP3
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-emerald-400 font-medium w-16">256 kbps</span>
+              <span class="text-xs text-zinc-400">Kualitas Standar Tinggi</span>
+            </div>
+            <button onclick="downloadMedia('audio', '256k')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-colors cursor-pointer">
+              Unduh MP3
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="font-mono text-xs text-emerald-400 font-medium w-16">128 kbps</span>
+              <span class="text-xs text-zinc-400">Ukuran Ringan</span>
+            </div>
+            <button onclick="downloadMedia('audio', '128k')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-colors cursor-pointer">
+              Unduh MP3
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Notice -->
+      <div id="statusNotice" class="hidden p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-300">
+        <span id="statusNoticeText">Menyiapkan berkas...</span>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-xl mx-auto w-full pt-4 border-t border-zinc-800 text-xs text-zinc-500 flex items-center justify-between">
+    <span>DONAT • donat.bangkit.io</span>
+    <span>yt-dlp engine</span>
+  </footer>
+
+  <script>
+    let currentMetadata = null;
+
+    document.getElementById('pasteBtn').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('urlInput').value = text;
+          fetchInfo();
+        }
+      } catch (err) {
+        alert('Tidak dapat mengakses papan klip. Tempel secara manual.');
+      }
+    });
+
+    async function fetchInfo() {
+      const url = document.getElementById('urlInput').value.trim();
+      const errorBox = document.getElementById('errorBox');
+      const errorText = document.getElementById('errorText');
+      const mediaCard = document.getElementById('mediaCard');
+      const fetchText = document.getElementById('fetchText');
+
+      if (!url) {
+        errorBox.classList.remove('hidden');
+        errorText.innerText = 'Masukkan tautan terlebih dahulu.';
+        return;
+      }
+
+      errorBox.classList.add('hidden');
+      fetchText.innerText = 'Memproses...';
+
+      try {
+        const res = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'Gagal memproses tautan.');
+        }
+
+        currentMetadata = data;
+
+        document.getElementById('mediaTitle').innerText = data.title;
+        document.getElementById('authorText').innerText = data.author;
+        document.getElementById('mediaDuration').innerText = data.duration;
+        document.getElementById('mediaThumbnail').src = data.thumbnail || '';
+        document.getElementById('platformBadge').innerText = data.platform;
+
+        mediaCard.classList.remove('hidden');
+      } catch (err) {
+        errorBox.classList.remove('hidden');
+        errorText.innerText = err.message;
+        mediaCard.classList.add('hidden');
+      } finally {
+        fetchText.innerText = 'Proses';
+      }
+    }
+
+    document.getElementById('fetchBtn').addEventListener('click', fetchInfo);
+    document.getElementById('urlInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') fetchInfo();
+    });
+
+    function switchTab(tab) {
+      const tabVideo = document.getElementById('tabVideo');
+      const tabAudio = document.getElementById('tabAudio');
+      const panelVideo = document.getElementById('panelVideo');
+      const panelAudio = document.getElementById('panelAudio');
+
+      if (tab === 'video') {
+        tabVideo.className = 'pb-2 px-3 font-medium text-white border-b-2 border-emerald-500 transition-all';
+        tabAudio.className = 'pb-2 px-3 font-medium text-zinc-400 hover:text-zinc-200 border-b-2 border-transparent transition-all';
+        panelVideo.classList.remove('hidden');
+        panelAudio.classList.add('hidden');
+      } else {
+        tabAudio.className = 'pb-2 px-3 font-medium text-white border-b-2 border-emerald-500 transition-all';
+        tabVideo.className = 'pb-2 px-3 font-medium text-zinc-400 hover:text-zinc-200 border-b-2 border-transparent transition-all';
+        panelAudio.classList.remove('hidden');
+        panelVideo.classList.add('hidden');
+      }
+    }
+
+    function downloadMedia(type, quality) {
+      if (!currentMetadata) return;
+
+      const url = document.getElementById('urlInput').value.trim();
+      const title = currentMetadata.title;
+      const notice = document.getElementById('statusNotice');
+      const noticeText = document.getElementById('statusNoticeText');
+
+      notice.classList.remove('hidden');
+      noticeText.innerText = `Menyiapkan ${type.toUpperCase()} (${quality})... Unduhan akan dimulai otomatis.`;
+
+      const downloadUrl = `/api/download?url=${encodeURIComponent(url)}&type=${type}&quality=${quality}&title=${encodeURIComponent(title)}`;
+      
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', '');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => {
+        notice.classList.add('hidden');
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
