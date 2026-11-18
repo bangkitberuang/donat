@@ -6,6 +6,7 @@ services:
     volumes:
       - ./public:/app/public
       - ./server.js:/app/server.js
+      - ./cookies.txt:/app/cookies.txt
     environment:
       - PORT=3000
     networks:

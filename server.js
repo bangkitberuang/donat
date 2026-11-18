@@ -8,6 +8,14 @@ const os = require('os');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const YTDLP_PATH = process.env.YTDLP_PATH || (process.platform === 'win32' ? path.join(__dirname, 'yt-dlp.exe') : 'yt-dlp');
+const COOKIES_PATH = path.join(__dirname, 'cookies.txt');
+
+function getCookieArgs() {
+  if (fs.existsSync(COOKIES_PATH)) {
+    return ['--cookies', COOKIES_PATH];
+  }
+  return [];
+}
 
 app.use(cors());
 app.use(express.json());
@@ -57,7 +65,8 @@ app.get('/api/info', (req, res) => {
   }
 
   // Jalankan yt-dlp untuk dump JSON metadata
-  execFile(YTDLP_PATH, ['--dump-single-json', '--no-playlist', targetUrl], { maxBuffer: 1024 * 1024 * 15 }, (err, stdout, stderr) => {
+  const infoArgs = ['--dump-single-json', '--no-playlist', ...getCookieArgs(), targetUrl];
+  execFile(YTDLP_PATH, infoArgs, { maxBuffer: 1024 * 1024 * 15 }, (err, stdout, stderr) => {
     if (err) {
       console.error('yt-dlp info error:', stderr);
       return res.status(500).json({ error: 'Gagal mengambil informasi link. Pastikan link publik dan benar.' });
@@ -100,7 +109,7 @@ app.get('/api/download', (req, res) => {
   const tempId = Date.now() + '_' + Math.floor(Math.random() * 1000);
   const tempDir = os.tmpdir();
 
-  let args = ['--no-playlist'];
+  let args = ['--no-playlist', ...getCookieArgs()];
   let ext = 'mp4';
   let contentType = 'video/mp4';
 
