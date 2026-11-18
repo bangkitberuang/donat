@@ -69,7 +69,16 @@ app.get('/api/info', (req, res) => {
   execFile(YTDLP_PATH, infoArgs, { maxBuffer: 1024 * 1024 * 15 }, (err, stdout, stderr) => {
     if (err) {
       console.error('yt-dlp info error:', stderr);
-      return res.status(500).json({ error: 'Gagal mengambil informasi link. Pastikan link publik dan benar.' });
+      const errOutput = (stderr || '') + (err.message || '');
+      let errorMsg = 'Gagal mengambil informasi link. Pastikan link publik dan benar.';
+      if (errOutput.includes("Sign in to confirm you’re not a bot") || errOutput.includes("confirm you're not a bot")) {
+        errorMsg = 'YouTube mendeteksi bot pada server. Perbarui cookies atau coba link YouTube Shorts / TikTok / Instagram lainnya.';
+      } else if (errOutput.includes('This video is unavailable') || errOutput.includes('Video unavailable')) {
+        errorMsg = 'Video tidak tersedia atau telah dihapus oleh pemiliknya.';
+      } else if (errOutput.includes('Private video')) {
+        errorMsg = 'Video ini bersifat privat (Private video).';
+      }
+      return res.status(500).json({ error: errorMsg });
     }
 
     try {
@@ -82,13 +91,24 @@ app.get('/api/info', (req, res) => {
       else if (/tiktok/i.test(host)) platform = 'TikTok';
       else if (/instagram/i.test(host)) platform = 'Instagram';
 
+      // Deteksi rasio video vertikal (Shorts, Reels, TikTok)
+      const isVertical = Boolean(
+        (data.width && data.height && data.height > data.width) ||
+        targetUrl.includes('/shorts/') ||
+        targetUrl.includes('/reel/') ||
+        platform === 'TikTok' ||
+        platform === 'Instagram'
+      );
+
       res.json({
         id: data.id,
         title: data.title || 'Video Tanpa Judul',
         author: data.uploader || data.channel || platform,
         duration: formatDuration(data.duration),
+        rawDuration: data.duration || 0,
         thumbnail: data.thumbnail || '',
-        platform: platform
+        platform: platform,
+        isVertical: isVertical
       });
     } catch (parseErr) {
       res.status(500).json({ error: 'Gagal membaca respon metadata.' });
@@ -119,15 +139,31 @@ app.get('/api/download', (req, res) => {
     const bitrate = quality === '320k' ? '320K' : (quality === '256k' ? '256K' : '128K');
     args.push('-x', '--audio-format', 'mp3', '--audio-quality', bitrate);
   } else {
-    // Video
+    // Video (Support Horizontal 16:9 DAN Vertical 9:16 Shorts/Reels/TikTok)
     ext = 'mp4';
     contentType = 'video/mp4';
-    let maxHeight = 1080;
-    if (quality === '720p') maxHeight = 720;
-    else if (quality === '480p') maxHeight = 480;
-    else if (quality === '360p') maxHeight = 360;
 
-    args.push('-f', `bv*[ext=mp4][height<=${maxHeight}]+ba[ext=m4a]/b[ext=mp4][height<=${maxHeight}]/bv*+ba/b`, '--merge-output-format', 'mp4');
+    let targetRes = 1080;
+    let maxDim = 1920; // 1920x1080 (horizontal) atau 1080x1920 (vertikal)
+    if (quality === '720p') {
+      targetRes = 720;
+      maxDim = 1280; // 1280x720 (horizontal) atau 720x1280 (vertikal)
+    } else if (quality === '480p') {
+      targetRes = 480;
+      maxDim = 854;  // 854x480 (horizontal) atau 480x854 (vertikal)
+    } else if (quality === '360p') {
+      targetRes = 360;
+      maxDim = 640;
+    }
+
+    // Prioritaskan H.264 (avc1) dan AAC (mp4a) dengan faststart agar 100% PASTI BISA DIPUTAR di iPhone, Android, dan PC
+    args.push(
+      '-S', `res:${targetRes},vcodec:h264,acodec:aac`,
+      '-f', `bv*[height<=?${maxDim}][width<=?${maxDim}][vcodec^=avc1]+ba[acodec^=mp4a]/bv*[height<=?${maxDim}][width<=?${maxDim}]+ba/b[height<=?${maxDim}][width<=?${maxDim}]/bv*+ba/b`,
+      '--merge-output-format', 'mp4',
+      '--recode-video', 'mp4',
+      '--postprocessor-args', 'Merger:-c:a aac -movflags +faststart'
+    );
   }
 
   const outputPattern = path.join(tempDir, `donat_${tempId}.%(ext)s`);
