@@ -19,6 +19,23 @@ app.use(express.static(path.join(__dirname, 'public'), {
   }
 }));
 
+// Helper sanitize URL (bersihkan parameter playlist/tracking agar tidak error)
+function sanitizeUrl(inputUrl) {
+  if (!inputUrl) return '';
+  let str = inputUrl.trim();
+  try {
+    const u = new URL(str);
+    if (u.hostname.includes('youtube.com') && u.searchParams.has('v')) {
+      return `https://www.youtube.com/watch?v=${u.searchParams.get('v')}`;
+    }
+    if (u.hostname === 'youtu.be') {
+      const vid = u.pathname.replace(/^\//, '').split('?')[0];
+      if (vid) return `https://www.youtube.com/watch?v=${vid}`;
+    }
+  } catch (e) {}
+  return str;
+}
+
 // Helper sanitize filename for iOS Safari / Windows
 function sanitizeFilename(name) {
   return name.replace(/[\\/:*?"<>|]/g, '').trim() || 'donat_file';
@@ -34,7 +51,7 @@ function formatDuration(sec) {
 
 // 1. Endpoint: Ambil Info Video / Audio
 app.get('/api/info', (req, res) => {
-  const targetUrl = req.query.url;
+  const targetUrl = sanitizeUrl(req.query.url);
   if (!targetUrl) {
     return res.status(400).json({ error: 'URL harus diisi' });
   }
@@ -72,7 +89,8 @@ app.get('/api/info', (req, res) => {
 
 // 2. Endpoint: Download & Stream langsung ke browser (iPhone / PC)
 app.get('/api/download', (req, res) => {
-  const { url: targetUrl, type, quality, title } = req.query;
+  const targetUrl = sanitizeUrl(req.query.url);
+  const { type, quality, title } = req.query;
 
   if (!targetUrl) {
     return res.status(400).send('URL diperlukan');

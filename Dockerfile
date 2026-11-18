@@ -1,8 +1,21 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
-RUN apk add --no-cache python3 ffmpeg curl ca-certificates \
-    && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    python3 \
+    python3-pip \
+    curl \
+    unzip \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Deno for yt-dlp EJS challenge solver
+RUN curl -fsSL https://deno.land/install.sh | sh \
+    && cp /root/.deno/bin/deno /usr/local/bin/ \
+    && rm -rf /root/.deno
+
+# Install yt-dlp with curl-cffi and default extras
+RUN pip3 install --no-cache-dir --break-system-packages "yt-dlp[default,curl-cffi]"
 
 WORKDIR /app
 
