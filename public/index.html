@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,170 +10,266 @@
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .surface-card {
+      background: linear-gradient(180deg, rgba(24, 24, 27, 0.65) 0%, rgba(18, 18, 20, 0.85) 100%);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+    .btn-emerald {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    .btn-emerald:hover {
+      background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+    }
+    .btn-secondary {
+      background: linear-gradient(180deg, rgba(39, 39, 42, 0.8) 0%, rgba(24, 24, 27, 0.9) 100%);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    }
+    .btn-secondary:hover {
+      background: linear-gradient(180deg, rgba(63, 63, 70, 0.9) 0%, rgba(39, 39, 42, 1) 100%);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    }
   </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 antialiased min-h-screen flex flex-col justify-between p-4 sm:p-8 font-sans selection:bg-emerald-500">
+<body class="bg-[#09090b] text-zinc-100 antialiased min-h-screen selection:bg-emerald-500 selection:text-white flex flex-col justify-between p-4 sm:p-8">
 
-  <!-- Header -->
-  <header class="max-w-xl mx-auto w-full flex items-center justify-between pb-4 border-b border-zinc-800">
-    <div class="flex items-center gap-3">
-      <img src="/logo.png" alt="DONAT Logo" class="w-8 h-8 rounded-lg object-contain">
+  <!-- Top Navigation Bar -->
+  <header class="max-w-3xl mx-auto w-full flex items-center justify-between pb-6 border-b border-zinc-800/80">
+    <div class="flex items-center gap-3.5">
+      <img src="/logo.png" alt="DONAT Logo" class="w-10 h-10 rounded-xl object-contain shadow-md shadow-emerald-500/10">
       <div>
-        <span class="font-bold text-sm text-white tracking-tight">DONAT</span>
-        <span class="text-xs text-zinc-400 block font-mono">donat.bangkit.io</span>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-base tracking-tight text-white">DONAT</span>
+          <span class="text-[11px] font-mono text-zinc-400 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">bangkit.io</span>
+        </div>
+        <p class="text-xs text-zinc-400">Media Extraction Engine</p>
       </div>
     </div>
-    <span class="text-xs text-zinc-400 font-mono">v1.0</span>
+
+    <!-- Engine Status Pill -->
+    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-400 font-mono">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
+      <span>yt-dlp core</span>
+    </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="max-w-xl mx-auto w-full my-auto py-8 space-y-6">
+  <!-- Main Hero & Utility -->
+  <main class="max-w-3xl mx-auto w-full my-auto py-8 sm:py-12 space-y-6">
 
-    <!-- Title Section -->
-    <section class="space-y-1">
-      <h1 class="text-2xl sm:text-3xl font-semibold text-white tracking-tight">Download &amp; Convert</h1>
-      <p class="text-xs sm:text-sm text-zinc-400">Unduh video dan ekstrak audio dari YouTube, TikTok, atau Instagram.</p>
+    <!-- Hero Title -->
+    <section class="space-y-1.5">
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+        Download &amp; Convert
+      </h1>
+      <p class="text-sm text-zinc-400">
+        Ekstraksi video dan audio resolusi tinggi langsung ke penyimpanan perangkat.
+      </p>
     </section>
 
-    <!-- Input Section -->
-    <section class="space-y-3">
-      <div class="flex gap-2">
-        <input 
-          id="urlInput"
-          type="url" 
-          placeholder="Tempel tautan video di sini..."
-          class="flex-1 px-3.5 py-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors"
-          autocomplete="off"
-          autocapitalize="off"
-        />
+    <!-- Professional Input Console -->
+    <section class="surface-card rounded-2xl p-2.5 sm:p-3 border border-zinc-800/80 space-y-2">
+      <div class="flex flex-col sm:flex-row gap-2">
+        <div class="relative flex-1 flex items-center">
+          <div class="absolute left-3.5 text-zinc-500 pointer-events-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+          </div>
+          <input 
+            id="urlInput"
+            type="url" 
+            placeholder="Tempel tautan YouTube, TikTok, atau Instagram..."
+            class="w-full pl-10 pr-20 py-3 rounded-xl bg-zinc-950/90 border border-zinc-800 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all font-mono text-xs sm:text-sm"
+            autocomplete="off"
+            autocapitalize="off"
+          />
+          <button 
+            id="pasteBtn"
+            class="absolute right-2 px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-[11px] font-medium text-zinc-300 transition-colors cursor-pointer"
+          >
+            Paste
+          </button>
+        </div>
+
         <button 
-          id="fetchBtn" 
-          class="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white transition-colors cursor-pointer shrink-0 flex items-center gap-2"
+          id="fetchBtn"
+          class="btn-emerald px-5 py-3 rounded-xl text-xs sm:text-sm font-medium text-white transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98 shrink-0"
         >
-          <span id="fetchText">Proses</span>
+          <span id="fetchLabel">Ekstrak Tautan</span>
+          <svg id="fetchArrow" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          <svg id="fetchSpinner" class="animate-spin w-4 h-4 hidden text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         </button>
       </div>
 
-      <div class="flex items-center justify-between text-xs text-zinc-400">
-        <span id="pasteBtn" class="hover:text-zinc-200 cursor-pointer underline">Tempel dari papan klip</span>
-        <span class="text-zinc-500">Berkas terunduh langsung ke perangkat</span>
+      <div class="flex items-center justify-between px-2 pt-1 text-[11px] text-zinc-400">
+        <span>Mendukung YouTube, TikTok (No-WM), dan Instagram Reels</span>
+        <span class="font-mono">Auto Direct Download</span>
       </div>
     </section>
 
     <!-- Error Box -->
-    <div id="errorBox" class="hidden p-3 rounded-lg bg-red-950/40 border border-red-800/60 text-red-300 text-xs">
+    <div id="errorBox" class="hidden p-3.5 rounded-xl bg-red-950/40 border border-red-800/60 text-red-300 text-xs flex items-center gap-2">
+      <svg class="w-4 h-4 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span id="errorText">Tautan tidak valid atau tidak dapat diproses.</span>
     </div>
 
-    <!-- Active Media Card -->
-    <section id="mediaCard" class="hidden p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-4">
+    <!-- Inspection Result Card -->
+    <section id="mediaCard" class="hidden surface-card rounded-2xl p-5 sm:p-6 border border-zinc-800/80 space-y-6">
       
-      <!-- Media Info -->
-      <div class="flex gap-3.5 items-start">
-        <div class="relative w-28 aspect-video rounded-md overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
-          <img id="mediaThumbnail" src="" alt="Thumbnail" class="w-full h-full object-cover">
-          <span id="mediaDuration" class="absolute bottom-1 right-1 px-1 py-0.2 rounded bg-black/80 font-mono text-[9px] text-zinc-200">00:00</span>
+      <!-- Video Inspector Header -->
+      <div class="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+        <div class="relative w-full sm:w-52 aspect-video rounded-xl overflow-hidden bg-black/80 border border-zinc-800 shrink-0 shadow-inner">
+          <img id="mediaThumbnail" src="" class="w-full h-full object-cover" alt="Media Preview">
+          <div class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-sm font-mono text-[11px] text-zinc-200">
+            <span id="mediaDuration">00:00</span>
+          </div>
         </div>
-        <div class="min-w-0 flex-1 space-y-1">
-          <span id="platformBadge" class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">Video</span>
-          <h2 id="mediaTitle" class="text-xs sm:text-sm font-medium text-zinc-100 line-clamp-2 leading-snug">
+
+        <div class="min-w-0 flex-1 space-y-2">
+          <div class="flex items-center gap-2">
+            <span id="platformBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 font-mono uppercase tracking-wider">
+              Video
+            </span>
+          </div>
+          
+          <h2 id="mediaTitle" class="text-base sm:text-lg font-semibold text-white leading-snug line-clamp-2">
             Judul Video
           </h2>
-          <p id="authorText" class="text-[11px] text-zinc-400 truncate">-</p>
+          
+          <div class="flex items-center gap-3 text-xs text-zinc-400 font-mono pt-0.5">
+            <span id="authorText">-</span>
+            <span>•</span>
+            <span>Streams Siap Diunduh</span>
+          </div>
         </div>
       </div>
 
-      <!-- Format Switcher -->
-      <div class="space-y-3">
-        <div class="flex border-b border-zinc-800 text-xs">
-          <button id="tabVideo" onclick="switchTab('video')" class="pb-2 px-3 font-medium text-white border-b-2 border-emerald-500 transition-all">
+      <!-- Segmented Tab Switcher -->
+      <div class="space-y-4">
+        <div class="flex p-1 rounded-xl bg-zinc-950 border border-zinc-800/80 max-w-xs text-xs font-medium">
+          <button id="tabVideo" onclick="switchTab('video')" class="flex-1 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition-all cursor-pointer">
             Video (MP4)
           </button>
-          <button id="tabAudio" onclick="switchTab('audio')" class="pb-2 px-3 font-medium text-zinc-400 hover:text-zinc-200 border-b-2 border-transparent transition-all">
+          <button id="tabAudio" onclick="switchTab('audio')" class="flex-1 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all cursor-pointer">
             Audio (MP3)
           </button>
         </div>
 
-        <!-- Video Options -->
-        <div id="panelVideo" class="space-y-1.5">
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-xs text-white font-medium w-12">1080p</span>
-              <span class="text-xs text-zinc-400">Full HD</span>
+        <!-- Video Format Inspector Table -->
+        <div id="panelVideo" class="divide-y divide-zinc-800/80 border border-zinc-800/80 rounded-xl overflow-hidden bg-zinc-950/40">
+          
+          <!-- 1080p -->
+          <div class="flex items-center justify-between p-3.5 sm:px-4 hover:bg-zinc-800/30 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-5">
+              <span class="font-mono text-xs font-semibold text-white px-2 py-1 rounded bg-zinc-800/80 border border-zinc-700/60">1080p</span>
+              <div>
+                <div class="text-xs sm:text-sm font-medium text-zinc-200">Full High Definition</div>
+                <div class="text-[11px] text-zinc-500 font-mono">AVC1 • H.264 • Kualitas Maksimal</div>
+              </div>
             </div>
-            <button onclick="downloadMedia('video', '1080p')" class="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs transition-colors cursor-pointer">
-              Unduh
+            <button onclick="downloadMedia('video', '1080p')" class="btn-secondary px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Unduh</span>
             </button>
           </div>
 
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-xs text-white font-medium w-12">720p</span>
-              <span class="text-xs text-zinc-400">HD</span>
+          <!-- 720p -->
+          <div class="flex items-center justify-between p-3.5 sm:px-4 hover:bg-zinc-800/30 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-5">
+              <span class="font-mono text-xs font-semibold text-zinc-300 px-2 py-1 rounded bg-zinc-800/50 border border-zinc-700/40">720p</span>
+              <div>
+                <div class="text-xs sm:text-sm font-medium text-zinc-200">Standard HD</div>
+                <div class="text-[11px] text-zinc-500 font-mono">AVC1 • H.264 • Cepat &amp; Jernih</div>
+              </div>
             </div>
-            <button onclick="downloadMedia('video', '720p')" class="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs transition-colors cursor-pointer">
-              Unduh
+            <button onclick="downloadMedia('video', '720p')" class="btn-secondary px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Unduh</span>
             </button>
           </div>
 
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-xs text-white font-medium w-12">480p</span>
-              <span class="text-xs text-zinc-400">SD</span>
+          <!-- 480p -->
+          <div class="flex items-center justify-between p-3.5 sm:px-4 hover:bg-zinc-800/30 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-5">
+              <span class="font-mono text-xs font-semibold text-zinc-400 px-2 py-1 rounded bg-zinc-900 border border-zinc-800">480p</span>
+              <div>
+                <div class="text-xs sm:text-sm font-medium text-zinc-300">Standard Definition</div>
+                <div class="text-[11px] text-zinc-500 font-mono">AVC1 • Hemat Kuota &amp; Penyimpanan</div>
+              </div>
             </div>
-            <button onclick="downloadMedia('video', '480p')" class="px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs transition-colors cursor-pointer">
-              Unduh
+            <button onclick="downloadMedia('video', '480p')" class="btn-secondary px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Unduh</span>
             </button>
           </div>
+
         </div>
 
-        <!-- Audio Options -->
-        <div id="panelAudio" class="space-y-1.5 hidden">
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-xs text-emerald-400 font-medium w-16">320 kbps</span>
-              <span class="text-xs text-zinc-400">Kualitas Maksimal</span>
+        <!-- Audio Format Inspector Table -->
+        <div id="panelAudio" class="hidden divide-y divide-zinc-800/80 border border-zinc-800/80 rounded-xl overflow-hidden bg-zinc-950/40">
+          
+          <!-- 320k -->
+          <div class="flex items-center justify-between p-3.5 sm:px-4 hover:bg-zinc-800/30 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-5">
+              <span class="font-mono text-xs font-semibold text-emerald-400 px-2 py-1 rounded bg-emerald-950/50 border border-emerald-800/40">320k</span>
+              <div>
+                <div class="text-xs sm:text-sm font-medium text-zinc-200">MP3 • Studio Fidelity</div>
+                <div class="text-[11px] text-zinc-500 font-mono">320 kbps CBR • 48 kHz Stereo</div>
+              </div>
             </div>
-            <button onclick="downloadMedia('audio', '320k')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-colors cursor-pointer">
-              Unduh MP3
+            <button onclick="downloadMedia('audio', '320k')" class="btn-emerald px-3.5 py-1.5 rounded-lg text-xs font-medium text-white transition-all cursor-pointer flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Ekstrak MP3</span>
             </button>
           </div>
 
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-xs text-emerald-400 font-medium w-16">256 kbps</span>
-              <span class="text-xs text-zinc-400">Kualitas Standar Tinggi</span>
+          <!-- 256k -->
+          <div class="flex items-center justify-between p-3.5 sm:px-4 hover:bg-zinc-800/30 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-5">
+              <span class="font-mono text-xs font-semibold text-emerald-400 px-2 py-1 rounded bg-emerald-950/30 border border-emerald-800/30">256k</span>
+              <div>
+                <div class="text-xs sm:text-sm font-medium text-zinc-200">MP3 • High Quality</div>
+                <div class="text-[11px] text-zinc-500 font-mono">256 kbps VBR • Standar Musik</div>
+              </div>
             </div>
-            <button onclick="downloadMedia('audio', '256k')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-colors cursor-pointer">
-              Unduh MP3
+            <button onclick="downloadMedia('audio', '256k')" class="btn-emerald px-3.5 py-1.5 rounded-lg text-xs font-medium text-white transition-all cursor-pointer flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Ekstrak MP3</span>
             </button>
           </div>
 
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-xs text-emerald-400 font-medium w-16">128 kbps</span>
-              <span class="text-xs text-zinc-400">Ukuran Ringan</span>
+          <!-- 128k -->
+          <div class="flex items-center justify-between p-3.5 sm:px-4 hover:bg-zinc-800/30 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-5">
+              <span class="font-mono text-xs font-semibold text-zinc-400 px-2 py-1 rounded bg-zinc-900 border border-zinc-800">128k</span>
+              <div>
+                <div class="text-xs sm:text-sm font-medium text-zinc-300">MP3 • Standard</div>
+                <div class="text-[11px] text-zinc-500 font-mono">128 kbps • Voice &amp; File Ringan</div>
+              </div>
             </div>
-            <button onclick="downloadMedia('audio', '128k')" class="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-colors cursor-pointer">
-              Unduh MP3
+            <button onclick="downloadMedia('audio', '128k')" class="btn-emerald px-3.5 py-1.5 rounded-lg text-xs font-medium text-white transition-all cursor-pointer flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Ekstrak MP3</span>
             </button>
           </div>
+
         </div>
       </div>
 
-      <!-- Status Notice -->
-      <div id="statusNotice" class="hidden p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-300">
-        <span id="statusNoticeText">Menyiapkan berkas...</span>
+      <!-- Live Download Notice -->
+      <div id="statusNotice" class="hidden p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 font-mono">
+        <span id="statusNoticeText">Menyiapkan stream berkas...</span>
       </div>
 
     </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="max-w-xl mx-auto w-full pt-4 border-t border-zinc-800 text-xs text-zinc-500 flex items-center justify-between">
-    <span>DONAT • donat.bangkit.io</span>
-    <span>yt-dlp engine</span>
+  <!-- Clean Utility Footer -->
+  <footer class="max-w-3xl mx-auto w-full pt-6 border-t border-zinc-800/80 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2 font-mono">
+    <span>DONAT Media Engine • donat.bangkit.io</span>
+    <span>Local Server Active</span>
   </footer>
 
   <script>
@@ -186,8 +282,8 @@
           document.getElementById('urlInput').value = text;
           fetchInfo();
         }
-      } catch (err) {
-        alert('Tidak dapat mengakses papan klip. Tempel secara manual.');
+      } catch (e) {
+        alert('Gunakan Ctrl+V / Cmd+V untuk menempel.');
       }
     });
 
@@ -196,16 +292,20 @@
       const errorBox = document.getElementById('errorBox');
       const errorText = document.getElementById('errorText');
       const mediaCard = document.getElementById('mediaCard');
-      const fetchText = document.getElementById('fetchText');
+      const fetchLabel = document.getElementById('fetchLabel');
+      const fetchArrow = document.getElementById('fetchArrow');
+      const fetchSpinner = document.getElementById('fetchSpinner');
 
       if (!url) {
         errorBox.classList.remove('hidden');
-        errorText.innerText = 'Masukkan tautan terlebih dahulu.';
+        errorText.innerText = 'Masukkan tautan media terlebih dahulu.';
         return;
       }
 
       errorBox.classList.add('hidden');
-      fetchText.innerText = 'Memproses...';
+      fetchLabel.innerText = 'Menganalisis...';
+      fetchArrow.classList.add('hidden');
+      fetchSpinner.classList.remove('hidden');
 
       try {
         const res = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
@@ -229,7 +329,9 @@
         errorText.innerText = err.message;
         mediaCard.classList.add('hidden');
       } finally {
-        fetchText.innerText = 'Proses';
+        fetchLabel.innerText = 'Ekstrak Tautan';
+        fetchArrow.classList.remove('hidden');
+        fetchSpinner.classList.add('hidden');
       }
     }
 
@@ -239,21 +341,21 @@
     });
 
     function switchTab(tab) {
-      const tabVideo = document.getElementById('tabVideo');
-      const tabAudio = document.getElementById('tabAudio');
-      const panelVideo = document.getElementById('panelVideo');
-      const panelAudio = document.getElementById('panelAudio');
+      const bVid = document.getElementById('tabVideo');
+      const bAud = document.getElementById('tabAudio');
+      const lVid = document.getElementById('listVid');
+      const lAud = document.getElementById('listAud');
 
-      if (tab === 'video') {
-        tabVideo.className = 'pb-2 px-3 font-medium text-white border-b-2 border-emerald-500 transition-all';
-        tabAudio.className = 'pb-2 px-3 font-medium text-zinc-400 hover:text-zinc-200 border-b-2 border-transparent transition-all';
-        panelVideo.classList.remove('hidden');
-        panelAudio.classList.add('hidden');
+      if (tab === 'vid') {
+        bVid.className = 'flex-1 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition-all cursor-pointer';
+        bAud.className = 'flex-1 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all cursor-pointer';
+        lVid.classList.remove('hidden');
+        lAud.classList.add('hidden');
       } else {
-        tabAudio.className = 'pb-2 px-3 font-medium text-white border-b-2 border-emerald-500 transition-all';
-        tabVideo.className = 'pb-2 px-3 font-medium text-zinc-400 hover:text-zinc-200 border-b-2 border-transparent transition-all';
-        panelAudio.classList.remove('hidden');
-        panelVideo.classList.add('hidden');
+        bAud.className = 'flex-1 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition-all cursor-pointer';
+        bVid.className = 'flex-1 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all cursor-pointer';
+        lAud.classList.remove('hidden');
+        lVid.classList.add('hidden');
       }
     }
 
@@ -279,7 +381,7 @@
 
       setTimeout(() => {
         notice.classList.add('hidden');
-      }, 5000);
+      }, 6000);
     }
   </script>
 </body>
