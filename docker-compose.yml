@@ -3,6 +3,9 @@ services:
     build: .
     container_name: donat-app
     restart: always
+    volumes:
+      - ./public:/app/public
+      - ./server.js:/app/server.js
     environment:
       - PORT=3000
     networks:
