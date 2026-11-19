@@ -1,302 +1,873 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DONAT — Video & Audio Downloader</title>
-  <meta name="description" content="Unduh video dan ekstrak audio MP3 dari YouTube, TikTok, dan Instagram dengan cepat dan bebas iklan.">
+  <title>DONAT — Studio Media Deck</title>
+  <meta name="description" content="DONAT (Download and Convert) — Dek ekstraksi video MP4 dan audio MP3 resolusi tinggi untuk YouTube, TikTok, dan Instagram.">
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
-  
-  <!-- Inter & JetBrains Mono for a clean, crafted, human aesthetic -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+          transitionTimingFunction: {
+            'studio': 'cubic-bezier(0.22, 1, 0.36, 1)',
+          }
+        }
+      }
+    };
+  </script>
+  <script>
+    // Apply persisted theme before first paint to prevent flash
+    (function() {
+      try {
+        const saved = localStorage.getItem('donat_theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.classList.remove('light', 'dark');
+        document.documentElement.classList.add(theme);
+      } catch (e) {}
+    })();
+  </script>
   <style>
-    * { -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      letter-spacing: -0.011em;
-    }
-    
-    .font-mono {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-    }
-    
-    /* Clean, tactile card surface without cheesy AI blobs */
-    .app-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-    }
-    
-    .input-field {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .input-field:focus {
-      background: #ffffff;
-      border-color: #059669;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    :root {
+      --bg-canvas: #f4f5f6;
+      --bg-bezel: rgba(235, 238, 242, 0.72);
+      --bg-console: rgba(255, 255, 255, 0.88);
+      --bg-well: #f8fafc;
+      --bg-well-focus: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fafafa;
+      --border-outer: rgba(15, 23, 42, 0.08);
+      --border-inner: rgba(15, 23, 42, 0.09);
+      --border-highlight: rgba(255, 255, 255, 0.9);
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --dot-color: rgba(15, 23, 42, 0.11);
+      --backdrop-opacity: 0.16;
     }
 
-    /* Tab switcher */
-    .tab-btn {
-      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+    html.dark {
+      --bg-canvas: #0c0d10;
+      --bg-bezel: rgba(24, 26, 31, 0.78);
+      --bg-console: rgba(18, 20, 24, 0.9);
+      --bg-well: #121419;
+      --bg-well-focus: #161920;
+      --bg-card: #17191e;
+      --bg-card-hover: #1d2027;
+      --border-outer: rgba(255, 255, 255, 0.09);
+      --border-inner: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(255, 255, 255, 0.07);
+      --text-primary: #f1f5f9;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --dot-color: rgba(255, 255, 255, 0.08);
+      --backdrop-opacity: 0.08;
     }
-    .tab-active {
-      background: #ffffff;
-      color: #0f172a;
-      font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e2e8f0;
+
+    * { -webkit-tap-highlight-color: transparent; }
+
+    /* Suppress transitions during instant theme swap */
+    html.theme-switching *,
+    html.theme-switching *::before,
+    html.theme-switching *::after {
+      transition: none !important;
     }
-    .tab-inactive {
-      color: #64748b;
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      letter-spacing: -0.011em;
     }
-    .tab-inactive:hover {
-      color: #0f172a;
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Architectural Drafting Dot Grid + Subtle Wallpaper */
+    .drafting-dots {
+      background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .arch-backdrop {
+      background-image: url('/bg.jpg');
+      opacity: var(--backdrop-opacity);
+    }
+
+    /* Double-Bezel Machined Console */
+    .studio-bezel {
+      background: var(--bg-bezel);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--border-outer);
+      box-shadow:
+        0 18px 42px -18px rgba(0, 0, 0, 0.14),
+        inset 0 1px 0 var(--border-highlight);
+    }
+
+    .studio-console {
+      background: var(--bg-console);
+      border: 1px solid var(--border-inner);
+      box-shadow: inset 0 1px 0 var(--border-highlight);
+    }
+
+    .studio-well {
+      background: var(--bg-well);
+      border: 1px solid var(--border-inner);
+      transition: border-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+                  background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .studio-well:focus-within {
+      background: var(--bg-well-focus);
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
+    }
+
+    .studio-cartridge {
+      background: var(--bg-card);
+      border: 1px solid var(--border-inner);
+      transition: border-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+                  background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (hover: hover) {
+      .studio-cartridge:hover {
+        background: var(--bg-card-hover);
+        border-color: rgba(16, 185, 129, 0.45);
+        box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    .studio-cartridge.is-active {
+      border-color: #10b981;
+      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35), 0 6px 16px -6px rgba(16, 185, 129, 0.18);
+    }
+
+    /* Segmented Folder Switcher */
+    .folder-rail {
+      background: var(--bg-well);
+      border: 1px solid var(--border-inner);
+    }
+
+    .folder-tab-active {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-inner);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 var(--border-highlight);
+    }
+
+    /* Keycap styling */
+    .keycap {
+      background: var(--bg-card);
+      border: 1px solid var(--border-inner);
+      box-shadow: 0 1px 0 var(--border-outer);
+    }
+
+    /* Skeleton loading bars */
+    @keyframes skeletonSweep {
+      100% { transform: translateX(100%); }
+    }
+
+    .skeleton-block {
+      position: relative;
+      overflow: hidden;
+      background: rgba(148, 163, 184, 0.16);
+    }
+
+    .skeleton-block::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+      animation: skeletonSweep 1.3s infinite;
+    }
+
+    /* Studio Acoustic Equalizer Bars (only visible in Audio tab) */
+    @keyframes eqPulse {
+      0%, 100% { transform: scaleY(0.32); }
+      50% { transform: scaleY(1); }
+    }
+
+    .eq-bar {
+      transform-origin: bottom;
+      animation: eqPulse 1.1s ease-in-out infinite;
+    }
+
+    .eq-bar:nth-child(2) { animation-delay: 0.18s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.36s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.12s; }
+    .eq-bar:nth-child(5) { animation-delay: 0.42s; }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton-block::after,
+      .eq-bar {
+        animation: none !important;
+      }
+      * {
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 antialiased selection:bg-emerald-600 selection:text-white p-4 sm:p-6">
+<body class="relative min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-600 selection:text-white overflow-x-hidden">
 
-  <!-- Header -->
-  <header class="max-w-2xl mx-auto w-full flex items-center justify-between pb-6 pt-2">
+  <!-- Background Layer: Architectural Photo + Technical Dot Grid + Vignette -->
+  <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+    <div class="arch-backdrop absolute inset-0 bg-cover bg-center sm:bg-bottom grayscale-[25%] contrast-[1.03]"></div>
+    <div class="drafting-dots absolute inset-0"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-canvas)]"></div>
+  </div>
+
+  <!-- Top Navigation / Brand Bar -->
+  <header class="max-w-2xl mx-auto w-full px-4 sm:px-6 pt-5 sm:pt-7 pb-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <img 
-        src="/logo.png" 
-        alt="DONAT" 
-        class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-xs"
-      >
+      <div class="p-0.5 rounded-[12px] border border-[var(--border-outer)] bg-[var(--bg-card)] shadow-xs">
+        <img
+          src="/logo.png"
+          alt="DONAT"
+          class="w-9 h-9 rounded-[10px] object-cover block"
+        >
+      </div>
       <div>
         <div class="flex items-center gap-2">
-          <span class="font-bold text-lg tracking-tight text-slate-900">DONAT</span>
-          <span class="text-[11px] font-mono font-medium text-slate-500 bg-slate-200/70 px-1.5 py-0.5 rounded">v1.2</span>
+          <span class="font-semibold text-base sm:text-lg tracking-tight text-[var(--text-primary)] leading-none">DONAT</span>
+          <span class="font-mono text-[10px] font-medium px-1.5 py-0.5 rounded-[5px] bg-[var(--bg-well)] border border-[var(--border-inner)] text-[var(--text-muted)]">
+            DECK v2
+          </span>
         </div>
-        <p class="text-xs text-slate-500">Download &amp; Convert</p>
+        <p class="text-xs text-[var(--text-muted)] mt-1 leading-none">Download &amp; Convert</p>
       </div>
     </div>
 
-    <div class="text-xs font-mono text-slate-400 hidden sm:block">
-      donat.bangkit.io
+    <div class="flex items-center gap-2">
+      <span class="hidden sm:inline-block font-mono text-[11px] text-[var(--text-muted)] mr-1">donat.bangkit.io</span>
+      <!-- Light / Dark Studio Theme Toggle -->
+      <button
+        id="themeToggleBtn"
+        type="button"
+        onclick="toggleTheme()"
+        aria-label="Ganti tema studio"
+        title="Ganti tema terang / gelap"
+        class="h-9 px-2.5 rounded-[10px] bg-[var(--bg-card)] border border-[var(--border-inner)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors active:scale-[0.97]"
+      >
+        <!-- Sun Icon (shown in Dark mode) -->
+        <svg id="iconSun" class="hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+        </svg>
+        <!-- Moon Icon (shown in Light mode) -->
+        <svg id="iconMoon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+        </svg>
+        <span id="themeLabel" class="hidden sm:inline">Gelap</span>
+      </button>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="max-w-2xl mx-auto w-full my-auto py-6 sm:py-10 flex flex-col gap-5">
+  <!-- Main Workspace -->
+  <main class="max-w-2xl mx-auto w-full px-4 sm:px-6 my-auto py-4 sm:py-8 flex flex-col gap-5">
 
-    <!-- Title Section -->
-    <div class="space-y-1">
-      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+    <!-- Focused Page Title -->
+    <div class="space-y-1.5 px-0.5">
+      <h1 class="text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] text-[var(--text-primary)] leading-tight">
         Download video &amp; audio
       </h1>
-      <p class="text-sm text-slate-500 leading-normal">
-        Unduh berkas video atau musik MP3 dari YouTube, TikTok, dan Instagram tanpa iklan.
+      <p class="text-[13px] sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+        Ekstrak berkas MP4 hingga 1080p atau audio MP3 320 kbps dari YouTube, TikTok, dan Instagram.
       </p>
     </div>
 
-    <!-- Main Input Form Card -->
-    <div class="app-card rounded-2xl p-3.5 sm:p-4 flex flex-col gap-3">
-      <div class="relative flex items-center">
-        <input 
-          id="urlInput"
-          type="url" 
-          placeholder="Tempel link YouTube, TikTok, atau Instagram di sini..." 
-          class="input-field w-full pl-3.5 pr-20 py-3 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none"
-        />
-        <button 
-          id="pasteBtn"
-          onclick="pasteClipboard()"
-          class="absolute right-2.5 px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200 shadow-2xs transition-colors cursor-pointer active:scale-95"
-        >
-          Paste
-        </button>
-      </div>
+    <!-- Double-Bezel Tactile Console -->
+    <div class="studio-bezel p-1.5 sm:p-2 rounded-[22px]">
+      <div class="studio-console rounded-[16px] p-3.5 sm:p-4 flex flex-col gap-3.5">
 
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
-        <div class="flex items-center gap-2 text-xs text-slate-500">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          <span>YouTube, TikTok (No-WM), Instagram Reels</span>
+        <!-- Console Telemetry Header Bar -->
+        <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-[var(--border-inner)]">
+          <div class="flex items-center gap-2 min-w-0">
+            <span id="telemetryDot" class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+            <span id="telemetryStatus" class="font-mono text-[11px] font-medium text-[var(--text-secondary)] truncate uppercase tracking-wide">
+              READY // MULTI-STREAM MUXER
+            </span>
+          </div>
+          <span class="font-mono text-[10px] text-[var(--text-muted)] shrink-0 hidden xs:inline sm:inline">
+            H.264 · AAC · LAME MP3
+          </span>
         </div>
-        <button 
-          id="fetchBtn"
-          onclick="handleFetch()"
-          class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.98]"
-        >
-          <span id="fetchLabel">Proses Link</span>
-          <svg id="fetchSpinner" class="hidden animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-        </button>
+
+        <!-- Smart URL Input Well -->
+        <div class="studio-well relative flex items-center rounded-[11px]">
+          <!-- Dynamic Left Platform Icon -->
+          <div id="inputPlatformIcon" class="pl-3.5 pr-2 text-[var(--text-muted)] flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+            </svg>
+          </div>
+
+          <input
+            id="urlInput"
+            type="url"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Tempel tautan video di sini..."
+            oninput="handleUrlInput()"
+            class="w-full py-3 pr-24 bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none"
+          />
+
+          <!-- Right Actions: Clear & Paste -->
+          <div class="absolute right-2 flex items-center gap-1">
+            <button
+              id="clearBtn"
+              type="button"
+              onclick="clearInput()"
+              aria-label="Hapus tautan"
+              class="hidden w-7 h-7 rounded-[7px] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+
+            <button
+              id="pasteBtn"
+              type="button"
+              onclick="pasteClipboard()"
+              class="h-7 px-2 rounded-[7px] bg-[var(--bg-card)] border border-[var(--border-inner)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-medium flex items-center gap-1.5 cursor-pointer transition-colors active:scale-[0.97]"
+            >
+              <span id="pasteLabel">Paste</span>
+              <kbd class="keycap hidden sm:inline-block px-1 py-0.2 rounded-[4px] font-mono text-[9px] text-[var(--text-muted)] leading-tight">⌘V</kbd>
+            </button>
+          </div>
+        </div>
+
+        <!-- Console Footer Action Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-0.5">
+          <!-- Supported Stream Pipelines -->
+          <div class="flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
+            <span class="inline-flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              <span>YouTube</span>
+            </span>
+            <span class="opacity-40">·</span>
+            <span class="inline-flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.97-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+              <span>TikTok</span>
+            </span>
+            <span class="opacity-40">·</span>
+            <span class="inline-flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              <span>Reels</span>
+            </span>
+          </div>
+
+          <button
+            id="fetchBtn"
+            type="button"
+            onclick="handleFetch()"
+            class="h-10 px-5 rounded-[10px] bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-[background-color,transform] duration-150 ease-studio active:scale-[0.97] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]"
+          >
+            <span id="fetchLabel">Ekstrak Media</span>
+            <svg id="fetchArrow" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6"></path>
+            </svg>
+            <svg id="fetchSpinner" class="hidden animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
+              <path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path>
+            </svg>
+          </button>
+        </div>
+
       </div>
     </div>
 
     <!-- Error Notice -->
-    <div id="errorBox" class="hidden p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm flex items-start gap-2.5">
-      <svg class="w-4 h-4 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-      <span id="errorText">Gagal mengambil informasi tautan.</span>
+    <div id="errorBox" role="alert" class="hidden p-3.5 rounded-[14px] bg-red-500/10 border border-red-500/25 text-red-700 dark:text-red-300 text-xs sm:text-sm flex items-start gap-2.5">
+      <svg class="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path>
+      </svg>
+      <span id="errorText" class="leading-relaxed">Gagal mengambil informasi tautan.</span>
     </div>
 
-    <!-- Media Card Result -->
-    <section id="mediaCard" class="hidden app-card rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
-      
-      <!-- Video Information Header -->
-      <div class="flex flex-col sm:flex-row gap-3.5 sm:items-center">
-        <div class="relative w-full sm:w-44 h-28 sm:h-28 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-200">
-          <img 
-            id="mediaThumbnail"
-            src="" 
-            alt="Thumbnail" 
-            class="w-full h-full object-cover"
+    <!-- Technical Skeleton State (Displayed during /api/info extraction) -->
+    <div id="skeletonCard" class="hidden studio-bezel p-1.5 sm:p-2 rounded-[22px]">
+      <div class="studio-console rounded-[16px] p-4 sm:p-5 flex flex-col gap-4">
+        <div class="skeleton-block w-full h-52 sm:h-64 rounded-[12px]"></div>
+        <div class="space-y-2.5">
+          <div class="skeleton-block h-5 w-4/5 rounded-[6px]"></div>
+          <div class="skeleton-block h-3.5 w-1/3 rounded-[6px]"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <div class="skeleton-block h-24 rounded-[12px]"></div>
+          <div class="skeleton-block h-24 rounded-[12px]"></div>
+          <div class="skeleton-block h-24 rounded-[12px]"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Limeplay Cinema Stage + Origin UI Format Cartridges -->
+    <section id="mediaCard" class="hidden studio-bezel p-1.5 sm:p-2 rounded-[22px]">
+      <div class="studio-console rounded-[16px] p-4 sm:p-5 flex flex-col gap-5">
+
+        <!-- Obsidian Monitor Frame -->
+        <div id="monitorFrame" class="relative w-full rounded-[12px] overflow-hidden bg-[#0a0b0e] border border-white/10 flex items-center justify-center min-h-[220px] sm:min-h-[260px] max-h-[380px]">
+          <!-- Ambient edge-lit blurred thumbnail backdrop -->
+          <img
+            id="mediaThumbnailBlur"
+            src=""
+            alt=""
+            aria-hidden="true"
+            class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none select-none"
           />
-          <span id="mediaDuration" class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-950/80 text-[10px] font-mono font-medium text-white">
+
+          <!-- Sharp foreground thumbnail -->
+          <img
+            id="mediaThumbnail"
+            src=""
+            alt="Thumbnail media"
+            class="relative z-10 max-h-[360px] w-auto max-w-full object-contain mx-auto rounded-[6px] ring-1 ring-white/10 shadow-2xl"
+          />
+
+          <!-- Top-Left Platform & Aspect Ratio Badge -->
+          <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5">
+            <span id="stagePlatformBadge" class="font-mono text-[10px] font-medium px-2 py-1 rounded-[6px] bg-black/75 text-white backdrop-blur-md border border-white/15 uppercase tracking-wide">
+              YOUTUBE
+            </span>
+            <span id="stageAspectBadge" class="font-mono text-[10px] font-medium px-2 py-1 rounded-[6px] bg-black/75 text-emerald-400 backdrop-blur-md border border-white/15 tabular-nums">
+              16:9
+            </span>
+          </div>
+
+          <!-- Bottom-Right Timecode Readout -->
+          <div id="stageDurationBadge" class="absolute bottom-3 right-3 z-20 font-mono text-[11px] font-medium px-2 py-1 rounded-[6px] bg-black/80 text-white backdrop-blur-md border border-white/15 tabular-nums">
             00:00
-          </span>
-        </div>
-        <div class="overflow-hidden flex-1 space-y-1">
-          <div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-            <span id="platformBadge" class="font-semibold text-slate-700">YOUTUBE</span>
-            <span>•</span>
-            <span id="authorText" class="truncate">Nama Channel</span>
           </div>
-          <h2 id="mediaTitle" class="text-sm sm:text-base font-semibold text-slate-900 leading-snug line-clamp-2">
-            Judul video muncul di sini...
-          </h2>
-        </div>
-      </div>
 
-      <!-- Format Switcher -->
-      <div class="border-t border-slate-100 pt-3 flex flex-col gap-3">
-        <div class="flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200/80">
-          <button 
-            id="tabVideo"
-            onclick="switchTab('video')"
-            class="flex-1 py-1.5 rounded-lg tab-btn tab-active text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-center gap-1.5"
+          <!-- Acoustic Mode Overlay (visible when Audio MP3 tab is active) -->
+          <div id="acousticOverlay" class="hidden absolute inset-x-0 bottom-0 z-20 px-3.5 py-2.5 bg-gradient-to-t from-black/90 via-black/70 to-transparent flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <div class="flex items-end gap-0.5 h-4 w-5" aria-hidden="true">
+                <span class="eq-bar w-0.5 h-full bg-emerald-400 rounded-full"></span>
+                <span class="eq-bar w-0.5 h-full bg-emerald-400 rounded-full"></span>
+                <span class="eq-bar w-0.5 h-full bg-emerald-400 rounded-full"></span>
+                <span class="eq-bar w-0.5 h-full bg-emerald-400 rounded-full"></span>
+                <span class="eq-bar w-0.5 h-full bg-emerald-400 rounded-full"></span>
+              </div>
+              <span class="font-mono text-[10px] sm:text-[11px] text-slate-200 tracking-wide">
+                STEREO PCM -> LAME MP3 CBR · 48kHz
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Media Metadata & Copy Title Action -->
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0 space-y-1">
+            <h2 id="mediaTitle" class="text-base sm:text-lg font-semibold text-[var(--text-primary)] leading-snug line-clamp-2">
+              Memuat judul media...
+            </h2>
+            <div class="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+              <span id="authorText" class="truncate font-medium">Kanal</span>
+              <span class="opacity-40">·</span>
+              <span id="platformMeta" class="font-mono text-[11px] text-[var(--text-muted)]">YouTube</span>
+            </div>
+          </div>
+
+          <button
+            id="copyTitleBtn"
+            type="button"
+            onclick="copyMediaTitle()"
+            class="shrink-0 h-8 px-2.5 rounded-[8px] bg-[var(--bg-well)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-inner)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors active:scale-[0.97]"
           >
-            Video (MP4)
-          </button>
-          <button 
-            id="tabAudio"
-            onclick="switchTab('audio')"
-            class="flex-1 py-1.5 rounded-lg tab-btn tab-inactive text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-center gap-1.5"
-          >
-            Audio (MP3)
+            <svg id="copyIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+            </svg>
+            <svg id="checkIcon" class="hidden w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span id="copyTitleLabel">Salin Judul</span>
           </button>
         </div>
 
-        <!-- Video Formats List -->
-        <div id="panelVideo" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          
-          <div onclick="triggerDownload('video', '1080p')" class="p-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col justify-between gap-2 group active:scale-[0.98]">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-900">1080p Full HD</span>
-              <span class="text-[10px] font-mono text-slate-400">MP4</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Kualitas maksimal</p>
-            <div class="pt-1.5 border-t border-slate-100 text-xs font-semibold text-emerald-600 flex items-center justify-between">
-              <span>Unduh</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        <!-- Segmented Folder Switcher -->
+        <div class="flex flex-col gap-3 pt-1 border-t border-[var(--border-inner)]">
+          <div class="folder-rail flex items-center justify-between p-1 rounded-[12px]">
+            <div class="flex items-center flex-1 gap-1">
+              <button
+                id="tabVideo"
+                type="button"
+                onclick="switchTab('video')"
+                class="flex-1 py-2 px-3 rounded-[8px] folder-tab-active text-xs sm:text-[13px] font-medium flex items-center justify-center gap-2 cursor-pointer transition-[color,background-color,box-shadow] duration-150"
+              >
+                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <span>Video (MP4)</span>
+                <kbd class="keycap hidden sm:inline-block px-1 py-0.2 rounded-[4px] font-mono text-[9px] text-[var(--text-muted)]">1</kbd>
+              </button>
+
+              <button
+                id="tabAudio"
+                type="button"
+                onclick="switchTab('audio')"
+                class="flex-1 py-2 px-3 rounded-[8px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs sm:text-[13px] font-medium flex items-center justify-center gap-2 cursor-pointer transition-[color,background-color,box-shadow] duration-150"
+              >
+                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path>
+                </svg>
+                <span>Audio (MP3)</span>
+                <kbd class="keycap hidden sm:inline-block px-1 py-0.2 rounded-[4px] font-mono text-[9px] text-[var(--text-muted)]">2</kbd>
+              </button>
             </div>
           </div>
 
-          <div onclick="triggerDownload('video', '720p')" class="p-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col justify-between gap-2 group active:scale-[0.98]">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-900">720p HD</span>
-              <span class="text-[10px] font-mono text-slate-400">MP4</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Hemat kuota</p>
-            <div class="pt-1.5 border-t border-slate-100 text-xs font-semibold text-slate-700 group-hover:text-emerald-600 flex items-center justify-between">
-              <span>Unduh</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
+          <!-- Origin UI Format Cartridges: Video (MP4) -->
+          <div id="panelVideo" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <!-- 1080p Full HD -->
+            <button
+              type="button"
+              id="card-video-1080p"
+              onclick="triggerDownload('video', '1080p')"
+              class="studio-cartridge text-left p-3.5 rounded-[12px] flex flex-col justify-between gap-3 cursor-pointer active:scale-[0.98]"
+            >
+              <div class="flex items-start justify-between gap-2 w-full">
+                <div>
+                  <div class="text-xs font-semibold text-[var(--text-primary)]">1080p Full HD</div>
+                  <div class="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">H.264 · MP4</div>
+                </div>
+                <!-- 3-Bar Quality Meter (3/3) -->
+                <div class="flex items-end gap-0.5 h-3.5" aria-label="Kualitas tinggi">
+                  <span class="w-1 h-1.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-2.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-3.5 rounded-[1px] bg-emerald-500"></span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between w-full pt-2 border-t border-[var(--border-inner)]">
+                <span id="size-video-1080p" class="font-mono text-[11px] text-[var(--text-secondary)] tabular-nums">~2.2 Mbps</span>
+                <span class="card-action inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  <span class="action-label">Unduh</span>
+                  <svg class="action-arrow w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"></path></svg>
+                  <svg class="action-spinner hidden animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path></svg>
+                </span>
+              </div>
+            </button>
+
+            <!-- 720p HD -->
+            <button
+              type="button"
+              id="card-video-720p"
+              onclick="triggerDownload('video', '720p')"
+              class="studio-cartridge text-left p-3.5 rounded-[12px] flex flex-col justify-between gap-3 cursor-pointer active:scale-[0.98]"
+            >
+              <div class="flex items-start justify-between gap-2 w-full">
+                <div>
+                  <div class="text-xs font-semibold text-[var(--text-primary)]">720p HD</div>
+                  <div class="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">H.264 · MP4</div>
+                </div>
+                <!-- 3-Bar Quality Meter (2/3) -->
+                <div class="flex items-end gap-0.5 h-3.5" aria-label="Kualitas menengah">
+                  <span class="w-1 h-1.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-2.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-3.5 rounded-[1px] bg-[var(--border-outer)]"></span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between w-full pt-2 border-t border-[var(--border-inner)]">
+                <span id="size-video-720p" class="font-mono text-[11px] text-[var(--text-secondary)] tabular-nums">~1.1 Mbps</span>
+                <span class="card-action inline-flex items-center gap-1 text-xs font-medium text-[var(--text-primary)]">
+                  <span class="action-label">Unduh</span>
+                  <svg class="action-arrow w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"></path></svg>
+                  <svg class="action-spinner hidden animate-spin w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path></svg>
+                </span>
+              </div>
+            </button>
+
+            <!-- 480p SD -->
+            <button
+              type="button"
+              id="card-video-480p"
+              onclick="triggerDownload('video', '480p')"
+              class="studio-cartridge text-left p-3.5 rounded-[12px] flex flex-col justify-between gap-3 cursor-pointer active:scale-[0.98]"
+            >
+              <div class="flex items-start justify-between gap-2 w-full">
+                <div>
+                  <div class="text-xs font-semibold text-[var(--text-primary)]">480p SD</div>
+                  <div class="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">H.264 · MP4</div>
+                </div>
+                <!-- 3-Bar Quality Meter (1/3) -->
+                <div class="flex items-end gap-0.5 h-3.5" aria-label="Kualitas hemat">
+                  <span class="w-1 h-1.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-2.5 rounded-[1px] bg-[var(--border-outer)]"></span>
+                  <span class="w-1 h-3.5 rounded-[1px] bg-[var(--border-outer)]"></span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between w-full pt-2 border-t border-[var(--border-inner)]">
+                <span id="size-video-480p" class="font-mono text-[11px] text-[var(--text-secondary)] tabular-nums">~0.6 Mbps</span>
+                <span class="card-action inline-flex items-center gap-1 text-xs font-medium text-[var(--text-primary)]">
+                  <span class="action-label">Unduh</span>
+                  <svg class="action-arrow w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"></path></svg>
+                  <svg class="action-spinner hidden animate-spin w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path></svg>
+                </span>
+              </div>
+            </button>
           </div>
 
-          <div onclick="triggerDownload('video', '480p')" class="p-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col justify-between gap-2 group active:scale-[0.98]">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-900">480p SD</span>
-              <span class="text-[10px] font-mono text-slate-400">MP4</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Ukuran terkecil</p>
-            <div class="pt-1.5 border-t border-slate-100 text-xs font-semibold text-slate-700 group-hover:text-emerald-600 flex items-center justify-between">
-              <span>Unduh</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
+          <!-- Origin UI Format Cartridges: Audio (MP3) -->
+          <div id="panelAudio" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <!-- 320 kbps -->
+            <button
+              type="button"
+              id="card-audio-320k"
+              onclick="triggerDownload('audio', '320k')"
+              class="studio-cartridge text-left p-3.5 rounded-[12px] flex flex-col justify-between gap-3 cursor-pointer active:scale-[0.98]"
+            >
+              <div class="flex items-start justify-between gap-2 w-full">
+                <div>
+                  <div class="text-xs font-semibold text-[var(--text-primary)]">320 kbps</div>
+                  <div class="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">CBR · MP3</div>
+                </div>
+                <div class="flex items-end gap-0.5 h-3.5" aria-label="Bitrate tertinggi">
+                  <span class="w-1 h-1.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-2.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-3.5 rounded-[1px] bg-emerald-500"></span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between w-full pt-2 border-t border-[var(--border-inner)]">
+                <span id="size-audio-320k" class="font-mono text-[11px] text-[var(--text-secondary)] tabular-nums">320 kbps</span>
+                <span class="card-action inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  <span class="action-label">Unduh</span>
+                  <svg class="action-arrow w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"></path></svg>
+                  <svg class="action-spinner hidden animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path></svg>
+                </span>
+              </div>
+            </button>
+
+            <!-- 256 kbps -->
+            <button
+              type="button"
+              id="card-audio-256k"
+              onclick="triggerDownload('audio', '256k')"
+              class="studio-cartridge text-left p-3.5 rounded-[12px] flex flex-col justify-between gap-3 cursor-pointer active:scale-[0.98]"
+            >
+              <div class="flex items-start justify-between gap-2 w-full">
+                <div>
+                  <div class="text-xs font-semibold text-[var(--text-primary)]">256 kbps</div>
+                  <div class="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">CBR · MP3</div>
+                </div>
+                <div class="flex items-end gap-0.5 h-3.5" aria-label="Bitrate menengah">
+                  <span class="w-1 h-1.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-2.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-3.5 rounded-[1px] bg-[var(--border-outer)]"></span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between w-full pt-2 border-t border-[var(--border-inner)]">
+                <span id="size-audio-256k" class="font-mono text-[11px] text-[var(--text-secondary)] tabular-nums">256 kbps</span>
+                <span class="card-action inline-flex items-center gap-1 text-xs font-medium text-[var(--text-primary)]">
+                  <span class="action-label">Unduh</span>
+                  <svg class="action-arrow w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"></path></svg>
+                  <svg class="action-spinner hidden animate-spin w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path></svg>
+                </span>
+              </div>
+            </button>
+
+            <!-- 128 kbps -->
+            <button
+              type="button"
+              id="card-audio-128k"
+              onclick="triggerDownload('audio', '128k')"
+              class="studio-cartridge text-left p-3.5 rounded-[12px] flex flex-col justify-between gap-3 cursor-pointer active:scale-[0.98]"
+            >
+              <div class="flex items-start justify-between gap-2 w-full">
+                <div>
+                  <div class="text-xs font-semibold text-[var(--text-primary)]">128 kbps</div>
+                  <div class="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">CBR · MP3</div>
+                </div>
+                <div class="flex items-end gap-0.5 h-3.5" aria-label="Bitrate hemat">
+                  <span class="w-1 h-1.5 rounded-[1px] bg-emerald-500"></span>
+                  <span class="w-1 h-2.5 rounded-[1px] bg-[var(--border-outer)]"></span>
+                  <span class="w-1 h-3.5 rounded-[1px] bg-[var(--border-outer)]"></span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between w-full pt-2 border-t border-[var(--border-inner)]">
+                <span id="size-audio-128k" class="font-mono text-[11px] text-[var(--text-secondary)] tabular-nums">128 kbps</span>
+                <span class="card-action inline-flex items-center gap-1 text-xs font-medium text-[var(--text-primary)]">
+                  <span class="action-label">Unduh</span>
+                  <svg class="action-arrow w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"></path></svg>
+                  <svg class="action-spinner hidden animate-spin w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path></svg>
+                </span>
+              </div>
+            </button>
           </div>
-
-        </div>
-
-        <!-- Audio Formats List -->
-        <div id="panelAudio" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-2">
-          
-          <div onclick="triggerDownload('audio', '320k')" class="p-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col justify-between gap-2 group active:scale-[0.98]">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-900">320 kbps</span>
-              <span class="text-[10px] font-mono text-slate-400">MP3</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Audio kualitas terbaik</p>
-            <div class="pt-1.5 border-t border-slate-100 text-xs font-semibold text-emerald-600 flex items-center justify-between">
-              <span>Unduh</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </div>
-
-          <div onclick="triggerDownload('audio', '256k')" class="p-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col justify-between gap-2 group active:scale-[0.98]">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-900">256 kbps</span>
-              <span class="text-[10px] font-mono text-slate-400">MP3</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Kualitas standar musik</p>
-            <div class="pt-1.5 border-t border-slate-100 text-xs font-semibold text-slate-700 group-hover:text-emerald-600 flex items-center justify-between">
-              <span>Unduh</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </div>
-
-          <div onclick="triggerDownload('audio', '128k')" class="p-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-white hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col justify-between gap-2 group active:scale-[0.98]">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-900">128 kbps</span>
-              <span class="text-[10px] font-mono text-slate-400">MP3</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Format ringkas</p>
-            <div class="pt-1.5 border-t border-slate-100 text-xs font-semibold text-slate-700 group-hover:text-emerald-600 flex items-center justify-between">
-              <span>Unduh</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </div>
-
         </div>
 
       </div>
+    </section>
 
+    <!-- Recent Session Queue -->
+    <section id="historySection" class="hidden flex flex-col gap-2.5 pt-1">
+      <div class="flex items-center justify-between px-1">
+        <h3 class="text-xs font-medium text-[var(--text-secondary)]">Riwayat ekstraksi</h3>
+        <button
+          type="button"
+          onclick="clearHistory()"
+          class="text-xs text-[var(--text-muted)] hover:text-red-500 transition-colors cursor-pointer"
+        >
+          Bersihkan
+        </button>
+      </div>
+      <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- Rendered safely via JS DOM nodes -->
+      </div>
     </section>
 
   </main>
 
-  <!-- Clean, unpretentious Footer -->
-  <footer class="max-w-2xl mx-auto w-full pt-6 pb-2 text-xs text-slate-400 flex items-center justify-between border-t border-slate-200">
+  <!-- Clean Bottom Download Bar / Notification -->
+  <div id="downloadNoticeBar" class="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:bottom-6 z-50 max-w-sm ml-auto pointer-events-none opacity-0 translate-y-4 transition-[opacity,transform] duration-200 ease-studio">
+    <div class="studio-bezel p-1 rounded-[16px] shadow-2xl pointer-events-auto">
+      <div class="studio-console rounded-[12px] px-3.5 py-3 flex items-start gap-3">
+        <svg class="animate-spin w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
+          <path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5A4.5 4.5 0 007.5 12H4z"></path>
+        </svg>
+        <div class="min-w-0 flex-1">
+          <div id="noticeTitle" class="text-xs font-semibold text-[var(--text-primary)]">Memproses berkas di server...</div>
+          <p id="noticeDesc" class="text-[11px] text-[var(--text-secondary)] mt-0.5 leading-relaxed">
+            Muxing sedang berjalan. Safari atau browser akan otomatis memunculkan konfirmasi unduh begitu berkas siap.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="max-w-2xl mx-auto w-full px-4 sm:px-6 pt-6 pb-5 text-xs text-[var(--text-muted)] flex items-center justify-between border-t border-[var(--border-inner)]">
     <div class="flex items-center gap-2">
-      <span class="font-medium text-slate-600">DONAT</span>
-      <span>•</span>
+      <span class="font-medium text-[var(--text-secondary)]">DONAT</span>
+      <span class="opacity-50">·</span>
       <span>Bangkit Beruang ecosystem</span>
     </div>
-    <div class="text-[11px] text-slate-400">
-      2026
-    </div>
+    <div class="font-mono text-[11px]">2026</div>
   </footer>
 
   <script>
     let currentMetadata = null;
+    let activeTab = 'video';
+    let downloadTimerInterval = null;
+    let downloadResetTimeout = null;
+    let noticeHideTimeout = null;
+
+    // SVG icon templates for input detection (single monochrome/brand mark)
+    const PLATFORM_ICONS = {
+      default: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>',
+      youtube: '<svg class="w-4 h-4 text-red-600 dark:text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+      tiktok: '<svg class="w-4 h-4 text-[var(--text-primary)]" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.97-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
+      instagram: '<svg class="w-4 h-4 text-pink-600 dark:text-pink-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>'
+    };
+
+    function syncThemeUI() {
+      const isDark = document.documentElement.classList.contains('dark');
+      document.getElementById('iconSun').classList.toggle('hidden', !isDark);
+      document.getElementById('iconMoon').classList.toggle('hidden', isDark);
+      document.getElementById('themeLabel').textContent = isDark ? 'Terang' : 'Gelap';
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      root.classList.add('theme-switching');
+      const next = root.classList.contains('dark') ? 'light' : 'dark';
+      root.classList.remove('light', 'dark');
+      root.classList.add(next);
+      try {
+        localStorage.setItem('donat_theme', next);
+      } catch (e) {}
+      syncThemeUI();
+      // Force layout flush before re-enabling CSS transitions
+      void root.offsetHeight;
+      requestAnimationFrame(() => root.classList.remove('theme-switching'));
+    }
+
+    function handleUrlInput() {
+      const input = document.getElementById('urlInput');
+      const val = input.value.trim();
+      const clearBtn = document.getElementById('clearBtn');
+      const iconEl = document.getElementById('inputPlatformIcon');
+
+      clearBtn.classList.toggle('hidden', !val);
+
+      if (/youtube\.com|youtu\.be/i.test(val)) {
+        iconEl.innerHTML = PLATFORM_ICONS.youtube;
+      } else if (/tiktok\.com/i.test(val)) {
+        iconEl.innerHTML = PLATFORM_ICONS.tiktok;
+      } else if (/instagram\.com/i.test(val)) {
+        iconEl.innerHTML = PLATFORM_ICONS.instagram;
+      } else {
+        iconEl.innerHTML = PLATFORM_ICONS.default;
+      }
+    }
+
+    function clearInput() {
+      const input = document.getElementById('urlInput');
+      input.value = '';
+      handleUrlInput();
+      input.focus();
+    }
 
     async function pasteClipboard() {
+      const label = document.getElementById('pasteLabel');
       try {
         const text = await navigator.clipboard.readText();
-        if (text) document.getElementById('urlInput').value = text;
+        if (text) {
+          document.getElementById('urlInput').value = text;
+          handleUrlInput();
+          label.textContent = 'Tersalin';
+          setTimeout(() => { label.textContent = 'Paste'; }, 1200);
+        }
       } catch (e) {
-        alert('Gunakan Ctrl+V / Cmd+V untuk menempelkan link.');
+        const input = document.getElementById('urlInput');
+        input.focus();
+        label.textContent = 'Ctrl+V';
+        setTimeout(() => { label.textContent = 'Paste'; }, 1500);
       }
+    }
+
+    function formatEstSize(rawDuration, mbps, fallbackSpec) {
+      if (!rawDuration || rawDuration <= 0) return fallbackSpec;
+      const mb = (rawDuration * mbps) / 8;
+      if (mb < 1) return '< 1 MB';
+      return `~${mb.toFixed(1)} MB`;
+    }
+
+    function updateSizeEstimates(rawDuration) {
+      document.getElementById('size-video-1080p').textContent = formatEstSize(rawDuration, 2.2, '~2.2 Mbps');
+      document.getElementById('size-video-720p').textContent = formatEstSize(rawDuration, 1.1, '~1.1 Mbps');
+      document.getElementById('size-video-480p').textContent = formatEstSize(rawDuration, 0.6, '~0.6 Mbps');
+      document.getElementById('size-audio-320k').textContent = formatEstSize(rawDuration, 0.32, '320 kbps');
+      document.getElementById('size-audio-256k').textContent = formatEstSize(rawDuration, 0.256, '256 kbps');
+      document.getElementById('size-audio-128k').textContent = formatEstSize(rawDuration, 0.128, '128 kbps');
+    }
+
+    function setTelemetry(statusText) {
+      document.getElementById('telemetryStatus').textContent = statusText;
     }
 
     async function handleFetch() {
@@ -304,76 +875,173 @@
       const errorBox = document.getElementById('errorBox');
       const errorText = document.getElementById('errorText');
       const mediaCard = document.getElementById('mediaCard');
+      const skeletonCard = document.getElementById('skeletonCard');
+      const fetchBtn = document.getElementById('fetchBtn');
       const fetchLabel = document.getElementById('fetchLabel');
+      const fetchArrow = document.getElementById('fetchArrow');
       const fetchSpinner = document.getElementById('fetchSpinner');
 
       if (!url) {
         errorBox.classList.remove('hidden');
-        errorText.innerText = 'Masukkan tautan video terlebih dahulu.';
+        errorText.textContent = 'Masukkan tautan video terlebih dahulu.';
         return;
       }
 
       errorBox.classList.add('hidden');
-      fetchLabel.innerText = 'Memproses...';
+      mediaCard.classList.add('hidden');
+      skeletonCard.classList.remove('hidden');
+      fetchBtn.disabled = true;
+      fetchLabel.textContent = 'Menganalisis...';
+      fetchArrow.classList.add('hidden');
       fetchSpinner.classList.remove('hidden');
+      setTelemetry('FETCHING // PROBING METADATA...');
 
       try {
         const res = await fetch('/api/info?url=' + encodeURIComponent(url));
-        if (res.ok) {
-          const data = await res.json();
-          currentMetadata = data;
-          document.getElementById('mediaTitle').innerText = data.title;
-          document.getElementById('authorText').innerText = data.author;
-          document.getElementById('mediaDuration').innerText = data.duration || 'Video';
-          document.getElementById('mediaThumbnail').src = data.thumbnail || '';
-          document.getElementById('platformBadge').innerText = data.platform.toUpperCase();
-
-          mediaCard.classList.remove('hidden');
-        } else {
+        if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
           throw new Error(errData.error || 'Gagal memproses tautan.');
         }
+
+        const data = await res.json();
+        currentMetadata = data;
+
+        // Populate stage & metadata
+        document.getElementById('mediaTitle').textContent = data.title;
+        document.getElementById('authorText').textContent = data.author || data.platform;
+        document.getElementById('platformMeta').textContent = data.platform;
+
+        const durationText = (!data.duration || data.duration === '00:00')
+          ? (data.isVertical ? '9:16' : 'HD')
+          : data.duration;
+
+        document.getElementById('stageDurationBadge').textContent = durationText;
+        document.getElementById('stagePlatformBadge').textContent = data.platform.toUpperCase();
+        document.getElementById('stageAspectBadge').textContent = data.isVertical ? '9:16' : '16:9';
+
+        const thumb = data.thumbnail || '';
+        document.getElementById('mediaThumbnail').src = thumb;
+        document.getElementById('mediaThumbnailBlur').src = thumb;
+
+        // Adjust monitor framing slightly for vertical media
+        const monitor = document.getElementById('monitorFrame');
+        if (data.isVertical) {
+          monitor.classList.add('sm:min-h-[300px]');
+        } else {
+          monitor.classList.remove('sm:min-h-[300px]');
+        }
+
+        updateSizeEstimates(data.rawDuration || 0);
+        resetCardDownloadStates();
+
+        skeletonCard.classList.add('hidden');
+        mediaCard.classList.remove('hidden');
+        setTelemetry(`ACTIVE // ${data.platform.toUpperCase()} · ${durationText}`);
+
+        saveToHistory(data, url);
       } catch (err) {
-        errorBox.classList.remove('hidden');
-        errorText.innerText = err.message || 'Gagal menganalisis video. Pastikan link publik dan benar.';
+        skeletonCard.classList.add('hidden');
         mediaCard.classList.add('hidden');
+        errorBox.classList.remove('hidden');
+        errorText.textContent = err.message || 'Gagal menganalisis video. Pastikan tautan bersifat publik.';
+        setTelemetry('READY // MULTI-STREAM MUXER');
       } finally {
-        fetchLabel.innerText = 'Proses Link';
+        fetchBtn.disabled = false;
+        fetchLabel.textContent = 'Ekstrak Media';
+        fetchArrow.classList.remove('hidden');
         fetchSpinner.classList.add('hidden');
       }
     }
 
-    document.getElementById('urlInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleFetch();
-    });
-
     function switchTab(tab) {
+      activeTab = tab;
       const bVid = document.getElementById('tabVideo');
       const bAud = document.getElementById('tabAudio');
-      const lVid = document.getElementById('panelVideo');
-      const lAud = document.getElementById('panelAudio');
+      const pVid = document.getElementById('panelVideo');
+      const pAud = document.getElementById('panelAudio');
+      const acousticOverlay = document.getElementById('acousticOverlay');
+
+      const activeClasses = 'flex-1 py-2 px-3 rounded-[8px] folder-tab-active text-xs sm:text-[13px] font-medium flex items-center justify-center gap-2 cursor-pointer transition-[color,background-color,box-shadow] duration-150';
+      const inactiveClasses = 'flex-1 py-2 px-3 rounded-[8px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs sm:text-[13px] font-medium flex items-center justify-center gap-2 cursor-pointer transition-[color,background-color,box-shadow] duration-150';
 
       if (tab === 'video') {
-        bVid.className = 'flex-1 py-1.5 rounded-lg tab-btn tab-active text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-center gap-1.5';
-        bAud.className = 'flex-1 py-1.5 rounded-lg tab-btn tab-inactive text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-center gap-1.5';
-        lVid.classList.remove('hidden');
-        lAud.classList.add('hidden');
+        bVid.className = activeClasses;
+        bAud.className = inactiveClasses;
+        pVid.classList.remove('hidden');
+        pAud.classList.add('hidden');
+        acousticOverlay.classList.add('hidden');
       } else {
-        bAud.className = 'flex-1 py-1.5 rounded-lg tab-btn tab-active text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-center gap-1.5';
-        bVid.className = 'flex-1 py-1.5 rounded-lg tab-btn tab-inactive text-xs sm:text-sm font-medium cursor-pointer flex items-center justify-center gap-1.5';
-        lAud.classList.remove('hidden');
-        lVid.classList.add('hidden');
+        bAud.className = activeClasses;
+        bVid.className = inactiveClasses;
+        pAud.classList.remove('hidden');
+        pVid.classList.add('hidden');
+        acousticOverlay.classList.remove('hidden');
       }
+    }
+
+    function resetCardDownloadStates() {
+      if (downloadTimerInterval) clearInterval(downloadTimerInterval);
+      if (downloadResetTimeout) clearTimeout(downloadResetTimeout);
+
+      document.querySelectorAll('.studio-cartridge').forEach((card) => {
+        card.classList.remove('is-active');
+        const label = card.querySelector('.action-label');
+        const arrow = card.querySelector('.action-arrow');
+        const spinner = card.querySelector('.action-spinner');
+        if (label) label.textContent = 'Unduh';
+        if (arrow) arrow.classList.remove('hidden');
+        if (spinner) spinner.classList.add('hidden');
+      });
+    }
+
+    function showDownloadNotice(title, desc) {
+      const bar = document.getElementById('downloadNoticeBar');
+      document.getElementById('noticeTitle').textContent = title;
+      document.getElementById('noticeDesc').textContent = desc;
+      bar.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+
+      if (noticeHideTimeout) clearTimeout(noticeHideTimeout);
+      noticeHideTimeout = setTimeout(() => {
+        bar.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+      }, 6500);
     }
 
     function triggerDownload(type, quality) {
       if (!currentMetadata) return;
 
-      const url = document.getElementById('urlInput').value.trim();
-      const title = currentMetadata.title;
+      resetCardDownloadStates();
 
-      const downloadUrl = '/api/download?url=' + encodeURIComponent(url) + '&type=' + type + '&quality=' + quality + '&title=' + encodeURIComponent(title);
-      
+      const cardId = `card-${type}-${quality}`;
+      const card = document.getElementById(cardId);
+      if (card) {
+        card.classList.add('is-active');
+        const label = card.querySelector('.action-label');
+        const arrow = card.querySelector('.action-arrow');
+        const spinner = card.querySelector('.action-spinner');
+        if (arrow) arrow.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+
+        let elapsed = 1;
+        if (label) label.textContent = `Menyiapkan... ${elapsed}s`;
+        downloadTimerInterval = setInterval(() => {
+          elapsed += 1;
+          if (label) label.textContent = `Menyiapkan... ${elapsed}s`;
+        }, 1000);
+
+        downloadResetTimeout = setTimeout(() => {
+          resetCardDownloadStates();
+        }, 12000);
+      }
+
+      const url = document.getElementById('urlInput').value.trim();
+      const title = currentMetadata.title || 'donat_media';
+
+      showDownloadNotice(
+        `Menyiapkan ${type.toUpperCase()} (${quality})`,
+        'Server sedang menggabungkan stream. Browser akan otomatis menyimpan berkas setelah selesai.'
+      );
+
+      const downloadUrl = `/api/download?url=${encodeURIComponent(url)}&type=${encodeURIComponent(type)}&quality=${encodeURIComponent(quality)}&title=${encodeURIComponent(title)}`;
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.setAttribute('download', '');
@@ -381,6 +1049,125 @@
       link.click();
       document.body.removeChild(link);
     }
+
+    async function copyMediaTitle() {
+      if (!currentMetadata || !currentMetadata.title) return;
+      try {
+        await navigator.clipboard.writeText(currentMetadata.title);
+        document.getElementById('copyIcon').classList.add('hidden');
+        document.getElementById('checkIcon').classList.remove('hidden');
+        document.getElementById('copyTitleLabel').textContent = 'Tersalin';
+        setTimeout(() => {
+          document.getElementById('copyIcon').classList.remove('hidden');
+          document.getElementById('checkIcon').classList.add('hidden');
+          document.getElementById('copyTitleLabel').textContent = 'Salin Judul';
+        }, 1500);
+      } catch (e) {}
+    }
+
+    // Recent Session History (XSS-safe DOM rendering)
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem('donat_history') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveToHistory(item, originalUrl) {
+      let list = getHistory().filter((h) => h.url !== originalUrl && h.id !== item.id);
+      list.unshift({
+        id: item.id,
+        title: item.title,
+        author: item.author,
+        duration: item.duration,
+        thumbnail: item.thumbnail,
+        platform: item.platform,
+        url: originalUrl
+      });
+      if (list.length > 4) list = list.slice(0, 4);
+      try {
+        localStorage.setItem('donat_history', JSON.stringify(list));
+      } catch (e) {}
+      renderHistory();
+    }
+
+    function clearHistory() {
+      try {
+        localStorage.removeItem('donat_history');
+      } catch (e) {}
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const section = document.getElementById('historySection');
+      const container = document.getElementById('historyList');
+      const list = getHistory();
+
+      container.innerHTML = '';
+      if (!list.length) {
+        section.classList.add('hidden');
+        return;
+      }
+
+      section.classList.remove('hidden');
+      list.forEach((item) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'studio-cartridge text-left p-2.5 rounded-[12px] flex items-center gap-3 cursor-pointer active:scale-[0.98] group';
+        btn.addEventListener('click', () => {
+          document.getElementById('urlInput').value = item.url;
+          handleUrlInput();
+          handleFetch();
+        });
+
+        const img = document.createElement('img');
+        img.src = item.thumbnail || '/logo.png';
+        img.alt = '';
+        img.className = 'w-14 h-10 rounded-[7px] object-cover bg-slate-900 border border-[var(--border-inner)] shrink-0';
+
+        const meta = document.createElement('div');
+        meta.className = 'min-w-0 flex-1';
+
+        const title = document.createElement('div');
+        title.className = 'text-xs font-medium text-[var(--text-primary)] truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors';
+        title.textContent = item.title;
+
+        const sub = document.createElement('div');
+        sub.className = 'font-mono text-[10px] text-[var(--text-muted)] truncate mt-0.5 tabular-nums';
+        sub.textContent = `${item.platform}${item.duration ? ' · ' + item.duration : ''}`;
+
+        meta.appendChild(title);
+        meta.appendChild(sub);
+
+        const chevron = document.createElement('span');
+        chevron.className = 'text-[var(--text-muted)] group-hover:text-emerald-500 transition-colors shrink-0';
+        chevron.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>';
+
+        btn.appendChild(img);
+        btn.appendChild(meta);
+        btn.appendChild(chevron);
+        container.appendChild(btn);
+      });
+    }
+
+    // Keyboard shortcuts: Enter in input, 1 / 2 for Video/Audio tab when card visible
+    document.getElementById('urlInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleFetch();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (document.getElementById('mediaCard').classList.contains('hidden')) return;
+      if (e.key === '1') switchTab('video');
+      if (e.key === '2') switchTab('audio');
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      syncThemeUI();
+      renderHistory();
+    });
   </script>
 </body>
 </html>
