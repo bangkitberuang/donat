@@ -3,122 +3,230 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DONAT • donat.bangkit.io</title>
+  <title>DONAT • Download & Convert</title>
   <meta name="description" content="DONAT (Download and Convert) - Ekstraksi video resolusi tinggi atau audio MP3 jernih langsung ke Smartphone atau PC Anda.">
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   
-  <!-- Modern Geometric Typography: Plus Jakarta Sans -->
+  <!-- Modern Geometric Typography: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
+    
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
       letter-spacing: -0.012em;
     }
-    .code-font {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    
+    .font-mono-code {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     }
     
-    /* 21st.dev Adjustable Glass System */
+    /* 21st.dev Ultra-Glass Surface System */
     .glass-canvas {
-      background: rgba(255, 255, 255, 0.78);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.7);
-      box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.65);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 
+        0 20px 40px -15px rgba(15, 23, 42, 0.07),
+        0 0 0 1px rgba(226, 232, 240, 0.8);
     }
-    .glass-inner-card {
-      background: rgba(255, 255, 255, 0.6);
+    
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.04);
-    }
-    .glass-input-bar {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(226, 232, 240, 0.9);
-      box-shadow: 0 4px 20px -3px rgba(16, 185, 129, 0.06);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
+    
     .glass-tab-active {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(255, 255, 255, 1);
-      box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.08);
+      background: #ffffff;
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.12), 0 2px 4px rgba(15, 23, 42, 0.04);
+    }
+
+    /* Skeleton shimmer */
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+    .skeleton-shimmer {
+      position: relative;
+      overflow: hidden;
+      background: #e2e8f0;
+    }
+    .skeleton-shimmer::after {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      animation: shimmer 1.5s infinite;
+      content: '';
+    }
+
+    /* Waveform Animation for Audio */
+    @keyframes waveBar {
+      0%, 100% { height: 6px; }
+      50% { height: 24px; }
+    }
+    .wave-bar {
+      animation: waveBar 1.2s ease-in-out infinite;
     }
   </style>
 </head>
 <body class="relative min-h-screen flex flex-col justify-between p-4 sm:p-8 text-slate-900 antialiased selection:bg-emerald-600 selection:text-white bg-slate-100 overflow-x-hidden">
 
-  <!-- Atmospheric Background Layer with Opacity -->
+  <!-- Atmospheric Background Layer with Soft Flares -->
   <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
     <div 
       class="absolute inset-0 bg-cover bg-center sm:bg-bottom opacity-20 sm:opacity-25 transition-opacity duration-700"
       style="background-image: url('/bg.jpg'); filter: saturate(1.15) contrast(1.05);"
     ></div>
     <!-- Soft Glassmorphic Radial Light Flares -->
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-300/25 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/3 -right-32 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-slate-50/85 via-slate-50/65 to-slate-100/90 backdrop-blur-[1px]"></div>
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/4 -right-32 w-96 h-96 bg-teal-300/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-indigo-200/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-50/85 via-slate-50/60 to-slate-100/90 backdrop-blur-[1px]"></div>
   </div>
 
   <!-- Header -->
   <header class="max-w-3xl mx-auto w-full flex items-center justify-between pb-6 border-b border-slate-200/80">
-    <div class="flex items-center gap-4">
-      <img src="/logo.png" alt="DONAT Logo" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-sm border border-slate-200/90">
-      <div>
-        <div class="flex items-center gap-2.5">
-          <span class="font-extrabold text-2xl sm:text-3xl tracking-tight text-slate-950">DONAT</span>
-          <span class="text-[11px] sm:text-xs font-semibold text-emerald-700 px-2.5 py-0.5 rounded-full bg-emerald-50/90 border border-emerald-200/80 shadow-2xs">donat.bangkit.io</span>
-        </div>
-        <p class="text-xs sm:text-sm font-medium text-slate-500">Download &amp; Convert</p>
+    <div class="flex items-center gap-3.5 sm:gap-4">
+      <div class="relative group">
+        <img 
+          src="/logo.png" 
+          alt="DONAT Logo" 
+          class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-md shadow-emerald-500/10 border border-slate-200/90 transition-transform duration-200 group-hover:scale-105"
+        >
+        <span class="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+        </span>
       </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-extrabold text-2xl sm:text-3xl tracking-tight text-slate-950">DONAT</span>
+          <span class="text-[11px] font-semibold text-emerald-800 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 shadow-2xs">
+            v1.2
+          </span>
+        </div>
+        <p class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1.5 mt-0.5">
+          <span>Download &amp; Convert</span>
+          <span>•</span>
+          <span class="text-emerald-700 font-semibold">Bebas Iklan</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Right Header Status Pill -->
+    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-slate-700">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="font-mono-code text-[11px] text-slate-600">donat.bangkit.io</span>
     </div>
   </header>
 
   <!-- Main Content Dashboard -->
   <main class="max-w-3xl mx-auto w-full my-auto py-8 sm:py-12 flex flex-col gap-6">
 
-    <!-- Hero Title -->
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">Download &amp; Convert</h1>
-      <p class="text-slate-500 text-xs sm:text-sm mt-1">Ekstraksi video resolusi tinggi atau audio MP3 jernih langsung ke Smartphone atau PC Anda.</p>
+    <!-- Hero Title & Platform Badges -->
+    <div class="flex flex-col gap-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill w-fit text-xs font-semibold text-emerald-800 border border-emerald-200/60 shadow-2xs">
+        <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        <span>Ekstraktor Multi-Platform Cepat &amp; Presisi</span>
+      </div>
+      <div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
+          Unduh Video &amp; Musik Seketika
+        </h1>
+        <p class="text-slate-600 text-xs sm:text-sm mt-1.5 leading-relaxed">
+          Ekstraksi video resolusi tinggi (1080p Full HD) dan audio MP3 jernih (320 kbps) langsung tersimpan ke perangkat Anda.
+        </p>
+      </div>
+
+      <!-- Quick Platform Demo Chips -->
+      <div class="flex flex-wrap items-center gap-2 pt-1">
+        <span class="text-xs font-medium text-slate-400">Didukung:</span>
+        <button 
+          onclick="setSample('https://www.youtube.com/watch?v=556TPwMMRqA')" 
+          class="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white text-slate-700 hover:text-red-600 border border-slate-200/80 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <span>YouTube</span>
+        </button>
+        <button 
+          onclick="setSample('https://www.tiktok.com/@persib/video/7338573177656347910')" 
+          class="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-200/80 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-slate-900" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.97-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+          <span>TikTok (No-WM)</span>
+        </button>
+        <button 
+          onclick="setSample('https://www.instagram.com/reels/C7Xf9sLphqW/')" 
+          class="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-white text-slate-700 hover:text-pink-600 border border-slate-200/80 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-pink-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          <span>Instagram Reels</span>
+        </button>
+      </div>
     </div>
 
-    <!-- 21st.dev Adjustable Glass Input Card -->
-    <div class="glass-canvas p-3 sm:p-4 rounded-2xl">
+    <!-- 21st.dev Glass Input Card -->
+    <div class="glass-canvas p-3 sm:p-4 rounded-3xl">
       <div class="relative flex items-center">
-        <div class="absolute left-3.5 text-slate-400 pointer-events-none">
-          <svg class="w-5 h-5 text-emerald-600/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+        
+        <!-- Dynamic Left Platform Icon -->
+        <div id="inputIconContainer" class="absolute left-3.5 text-slate-400 pointer-events-none transition-colors duration-200">
+          <svg id="defaultLinkIcon" class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
         </div>
+
         <input 
           id="urlInput"
           type="url" 
-          placeholder="Tempel link YouTube, TikTok, atau Instagram..." 
-          class="w-full pl-11 pr-24 py-3.5 rounded-xl bg-white/90 border border-slate-200/90 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 transition-all text-xs sm:text-sm"
+          placeholder="Tempel tautan video YouTube, TikTok, atau Instagram..." 
+          oninput="handleUrlInput()"
+          class="w-full pl-11 pr-28 py-3.5 sm:py-4 rounded-2xl bg-white/90 border border-slate-200/90 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 transition-all text-xs sm:text-sm font-medium"
         />
-        <button 
-          onclick="pasteClipboard()"
-          class="absolute right-3 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-slate-600 text-xs font-semibold transition-all cursor-pointer border border-slate-200/70"
-        >
-          Paste
-        </button>
+
+        <!-- Right Action Tools (Clear & Paste) -->
+        <div class="absolute right-2.5 flex items-center gap-1.5">
+          <button 
+            id="clearBtn"
+            onclick="clearInput()"
+            title="Bersihkan input"
+            class="hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+          <button 
+            id="pasteBtn"
+            onclick="pasteClipboard()"
+            class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/90 text-slate-700 text-xs font-semibold transition-all cursor-pointer border border-slate-200/80 active:scale-95 flex items-center gap-1 shadow-2xs"
+          >
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <span id="pasteLabel">Paste</span>
+          </button>
+        </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-3 pt-3 border-t border-slate-200/60">
         <span class="text-xs text-slate-500 flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>Mendukung YouTube, TikTok (No-WM), &amp; Instagram Reels</span>
+          <span>Ekstraksi instan • Format MP4 &amp; MP3 HD</span>
         </span>
         <button 
           id="fetchBtn"
           onclick="handleFetch()"
-          class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-emerald-600/20 active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+          class="px-5 py-2.5 sm:py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-emerald-600/25 active:scale-[0.97] cursor-pointer flex items-center justify-center gap-2"
         >
           <span id="fetchLabel">Ekstrak Tautan</span>
           <svg id="fetchArrow" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -128,23 +236,42 @@
     </div>
 
     <!-- Error Notice Card -->
-    <div id="errorBox" class="hidden p-4 rounded-xl bg-red-50/90 border border-red-200/80 text-red-700 text-xs sm:text-sm flex items-start gap-2.5 backdrop-blur-md">
-      <svg class="w-5 h-5 shrink-0 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-      <span id="errorText">Gagal mengambil informasi tautan.</span>
+    <div id="errorBox" class="hidden p-4 rounded-2xl bg-red-50/95 border border-red-200/80 text-red-700 text-xs sm:text-sm flex items-start gap-3 backdrop-blur-md shadow-sm">
+      <div class="p-1 rounded-lg bg-red-100 text-red-600 shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+      <div>
+        <div class="font-bold text-red-900">Gagal Memproses Video</div>
+        <p id="errorText" class="mt-0.5 text-red-700">Pastikan tautan bersifat publik dan dapat diakses.</p>
+      </div>
     </div>
 
-    <!-- 21st.dev Glass Folder & Player Card Overlay -->
-    <section id="mediaCard" class="hidden glass-canvas rounded-2xl p-4 sm:p-6 flex flex-col gap-6">
+    <!-- Skeleton Loader for Smooth UX -->
+    <div id="skeletonCard" class="hidden glass-canvas rounded-3xl p-5 sm:p-6 flex flex-col gap-6">
+      <div class="skeleton-shimmer h-60 w-full rounded-2xl"></div>
+      <div class="space-y-3">
+        <div class="skeleton-shimmer h-6 w-3/4 rounded-lg"></div>
+        <div class="skeleton-shimmer h-4 w-1/3 rounded-lg"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="skeleton-shimmer h-24 rounded-2xl"></div>
+        <div class="skeleton-shimmer h-24 rounded-2xl"></div>
+        <div class="skeleton-shimmer h-24 rounded-2xl"></div>
+      </div>
+    </div>
 
-      <!-- Media Player Layout Inspired by @limeplay/player-layout -->
-      <div class="relative w-full rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-950 shadow-sm flex items-center justify-center" style="min-height: 240px; max-height: 380px;">
+    <!-- Result Media Card: 21st.dev Glass Folder & Player Card Overlay -->
+    <section id="mediaCard" class="hidden glass-canvas rounded-3xl p-4 sm:p-6 flex flex-col gap-6">
+
+      <!-- Media Stage Inspired by @limeplay/player-layout -->
+      <div class="relative w-full rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-950 shadow-sm flex items-center justify-center min-h-[260px] max-h-[400px]">
         
         <!-- Ambient Blurred Backdrop -->
         <img 
           id="mediaThumbnailBlur"
           src="" 
           alt="" 
-          class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+          class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-45 scale-110 pointer-events-none transition-all duration-700"
         />
 
         <!-- Centered Foreground Thumbnail / Video Stage -->
@@ -152,46 +279,47 @@
           id="mediaThumbnail"
           src="" 
           alt="Media Thumbnail" 
-          class="relative z-10 max-h-[360px] w-auto max-w-full object-contain mx-auto shadow-2xl transition-transform duration-500"
+          class="relative z-10 max-h-[380px] w-auto max-w-full object-contain mx-auto shadow-2xl transition-transform duration-500 rounded-lg"
         />
 
         <!-- Top Badges Overlay -->
         <div class="absolute top-3 left-3 z-20 flex items-center gap-2">
-          <span id="platformBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-950/70 text-white backdrop-blur-md border border-white/20 tracking-wider uppercase">
-            YOUTUBE
+          <span id="platformBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-950/75 text-white backdrop-blur-md border border-white/20 tracking-wider uppercase flex items-center gap-1.5 shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span id="platformBadgeText">YOUTUBE</span>
           </span>
-          <span id="orientationBadge" class="hidden text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/80 text-white backdrop-blur-md border border-emerald-400/40 tracking-wider uppercase">
+          <span id="orientationBadge" class="hidden text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600/90 text-white backdrop-blur-md border border-emerald-400/40 tracking-wider uppercase shadow-sm">
             VERTICAL
           </span>
         </div>
 
         <!-- Duration Badge Overlay -->
         <div id="mediaDurationBadge" class="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-[11px] font-semibold text-white border border-white/15 flex items-center gap-1.5 shadow-md">
-          <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
           <span id="mediaDuration">HD</span>
         </div>
       </div>
 
       <!-- Video Details & Author -->
-      <div class="space-y-1">
-        <h2 id="mediaTitle" class="text-base sm:text-lg font-bold text-slate-950 leading-snug line-clamp-2">
+      <div class="space-y-1.5">
+        <h2 id="mediaTitle" class="text-base sm:text-xl font-extrabold text-slate-950 leading-snug line-clamp-2">
           Memuat judul video...
         </h2>
         <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
           <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-          <span id="authorText" class="truncate">Kanal Video</span>
+          <span id="authorText" class="truncate font-semibold text-slate-700">Kanal Video</span>
           <span>•</span>
-          <span class="text-emerald-700 font-semibold">Tervalidasi</span>
+          <span class="text-emerald-700 font-semibold px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200/80">Tervalidasi</span>
         </div>
       </div>
 
       <!-- 21st.dev Glass Folder Cards Tab Selector (@kedhareswer/glass-folder-cards) -->
       <div class="flex flex-col gap-3">
-        <div class="flex items-center p-1 rounded-xl bg-slate-200/60 border border-slate-300/50 backdrop-blur-md">
+        <div class="flex items-center p-1 rounded-2xl bg-slate-200/70 border border-slate-300/60 backdrop-blur-md">
           <button 
             id="tabVideo"
             onclick="switchTab('video')"
-            class="flex-1 py-2 rounded-lg glass-tab-active text-slate-950 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+            class="flex-1 py-2.5 rounded-xl glass-tab-active text-slate-950 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
             <span>Video (MP4)</span>
@@ -199,7 +327,7 @@
           <button 
             id="tabAudio"
             onclick="switchTab('audio')"
-            class="flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-950 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center justify-center gap-2"
+            class="flex-1 py-2.5 rounded-xl text-slate-600 hover:text-slate-950 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
             <span>Audio (MP3)</span>
@@ -209,106 +337,106 @@
         <!-- 21st.dev Origin UI Radio Card Format Selector (@originui/components/radio-group) -->
         
         <!-- Video Resolutions -->
-        <div id="panelVideo" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div id="panelVideo" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           
           <!-- 1080p Full HD Card -->
-          <div onclick="triggerDownload('video', '1080p')" class="group relative p-3.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3">
+          <div onclick="triggerDownload('video', '1080p')" class="group relative p-4 rounded-2xl border border-slate-200/90 bg-white/85 hover:bg-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer flex flex-col justify-between gap-3 active:scale-[0.97]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">1080p FHD</span>
-              <span class="text-[11px] font-semibold text-slate-400">~78 MB</span>
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">1080p FHD</span>
+              <span class="text-[11px] font-semibold text-slate-400">Jernih</span>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">High Definition</div>
-              <div class="text-[11px] text-slate-500">H.264 • Universal MP4</div>
+              <div class="text-xs font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">Full High Definition</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">H.264 • Universal MP4</div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:translate-x-0.5 transition-transform">
               <span>Unduh 1080p</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </div>
 
           <!-- 720p HD Card -->
-          <div onclick="triggerDownload('video', '720p')" class="group relative p-3.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3">
+          <div onclick="triggerDownload('video', '720p')" class="group relative p-4 rounded-2xl border border-slate-200/90 bg-white/85 hover:bg-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer flex flex-col justify-between gap-3 active:scale-[0.97]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-200">720p HD</span>
-              <span class="text-[11px] font-semibold text-slate-400">~42 MB</span>
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-800 border border-slate-200">720p HD</span>
+              <span class="text-[11px] font-semibold text-slate-400">Cepat</span>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Standard HD</div>
-              <div class="text-[11px] text-slate-500">Hemat Kuota &amp; Seimbang</div>
+              <div class="text-xs font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">Standard HD</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Hemat Kuota &amp; Seimbang</div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-700 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all">
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all">
               <span>Unduh 720p</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </div>
 
           <!-- 480p Card -->
-          <div onclick="triggerDownload('video', '480p')" class="group relative p-3.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3">
+          <div onclick="triggerDownload('video', '480p')" class="group relative p-4 rounded-2xl border border-slate-200/90 bg-white/85 hover:bg-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer flex flex-col justify-between gap-3 active:scale-[0.97]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">480p SD</span>
-              <span class="text-[11px] font-semibold text-slate-400">~21 MB</span>
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200">480p SD</span>
+              <span class="text-[11px] font-semibold text-slate-400">Ringan</span>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Mobile Compact</div>
-              <div class="text-[11px] text-slate-500">Ukuran Paling Ringan</div>
+              <div class="text-xs font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">Mobile Compact</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Ukuran Paling Hemat</div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-700 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all">
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all">
               <span>Unduh 480p</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </div>
 
         </div>
 
         <!-- Audio Bitrates -->
-        <div id="panelAudio" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div id="panelAudio" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3">
           
           <!-- 320k Card -->
-          <div onclick="triggerDownload('audio', '320k')" class="group relative p-3.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3">
+          <div onclick="triggerDownload('audio', '320k')" class="group relative p-4 rounded-2xl border border-slate-200/90 bg-white/85 hover:bg-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer flex flex-col justify-between gap-3 active:scale-[0.97]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">320 kbps</span>
-              <span class="text-[11px] font-semibold text-slate-400">~8.5 MB</span>
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">320 kbps</span>
+              <span class="text-[11px] font-semibold text-emerald-700">Studio</span>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Studio Fidelity</div>
-              <div class="text-[11px] text-slate-500">320 kbps CBR Stereo</div>
+              <div class="text-xs font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">Studio Fidelity</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">320 kbps CBR Stereo</div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:translate-x-0.5 transition-transform">
               <span>Unduh MP3</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </div>
 
           <!-- 256k Card -->
-          <div onclick="triggerDownload('audio', '256k')" class="group relative p-3.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3">
+          <div onclick="triggerDownload('audio', '256k')" class="group relative p-4 rounded-2xl border border-slate-200/90 bg-white/85 hover:bg-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer flex flex-col justify-between gap-3 active:scale-[0.97]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">256 kbps</span>
-              <span class="text-[11px] font-semibold text-slate-400">~6.8 MB</span>
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">256 kbps</span>
+              <span class="text-[11px] font-semibold text-slate-400">HQ</span>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">High Quality</div>
-              <div class="text-[11px] text-slate-500">Rekomendasi Musik</div>
+              <div class="text-xs font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">High Quality</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Rekomendasi Musik</div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:translate-x-0.5 transition-transform">
               <span>Unduh MP3</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </div>
 
           <!-- 128k Card -->
-          <div onclick="triggerDownload('audio', '128k')" class="group relative p-3.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-3">
+          <div onclick="triggerDownload('audio', '128k')" class="group relative p-4 rounded-2xl border border-slate-200/90 bg-white/85 hover:bg-white hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer flex flex-col justify-between gap-3 active:scale-[0.97]">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">128 kbps</span>
-              <span class="text-[11px] font-semibold text-slate-400">~3.5 MB</span>
+              <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200">128 kbps</span>
+              <span class="text-[11px] font-semibold text-slate-400">Hemat</span>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Standard Audio</div>
-              <div class="text-[11px] text-slate-500">Podcast &amp; Hemat Ruang</div>
+              <div class="text-xs font-bold text-slate-950 group-hover:text-emerald-700 transition-colors">Standard Audio</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">Podcast &amp; Speech</div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-700 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all">
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all">
               <span>Unduh MP3</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </div>
 
@@ -316,37 +444,105 @@
 
       </div>
 
-      <!-- Status Notice -->
-      <div id="statusNotice" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2">
-        <svg class="animate-spin w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-        <span id="statusNoticeText">Menyiapkan berkas unduhan...</span>
+      <!-- iPhone Safari Tip Notice -->
+      <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/70 text-xs text-amber-900 flex items-start gap-2.5">
+        <span class="text-base leading-none">📱</span>
+        <div>
+          <span class="font-bold">Tips Pengguna iPhone / Safari:</span>
+          <span class="text-amber-800"> Saat menekan tombol unduh, ketuk <strong>"Unduh"</strong> jika Safari menampilkan konfirmasi pop-up. File otomatis tersimpan di aplikasi <em>Files</em> (Berkas).</span>
+        </div>
       </div>
 
     </section>
 
+    <!-- Recent History Section (Local Storage) -->
+    <div id="historySection" class="hidden flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Riwayat Terakhir</h3>
+        <button onclick="clearHistory()" class="text-[11px] font-medium text-slate-400 hover:text-red-600 transition-colors cursor-pointer">Hapus Riwayat</button>
+      </div>
+      <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- Dynamically injected -->
+      </div>
+    </div>
+
   </main>
 
-  <!-- Clean Footer (Bangkit Beruang ecosystem) -->
-  <footer class="max-w-3xl mx-auto w-full pt-6 border-t border-slate-200/80 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-    <div class="flex items-center gap-2">
-      <span class="font-semibold text-slate-700">DONAT</span>
-      <span>•</span>
-      <span class="font-medium text-slate-500">donat.bangkit.io</span>
+  <!-- Floating Toast Notification -->
+  <div id="floatingToast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none max-w-sm w-full sm:w-auto">
+    <div class="p-4 rounded-2xl bg-slate-950/90 text-white backdrop-blur-xl border border-white/20 shadow-2xl flex items-center gap-3">
+      <div class="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+        <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+      </div>
+      <div>
+        <div id="toastTitle" class="text-xs font-bold text-white">Memulai Unduhan...</div>
+        <p id="toastDesc" class="text-[11px] text-slate-300 mt-0.5">Browser Anda sedang mengunduh berkas.</p>
+      </div>
     </div>
-    <div class="font-medium text-slate-600">
-      Bangkit Beruang ecosystem
+  </div>
+
+  <!-- Clean Footer (Bangkit Beruang ecosystem) -->
+  <footer class="max-w-3xl mx-auto w-full pt-8 pb-4 border-t border-slate-200/80 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <span class="font-bold text-slate-800">DONAT</span>
+      <span>•</span>
+      <span class="font-mono-code text-[11px] text-slate-500">donat.bangkit.io</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-medium text-slate-500">
+      <span class="text-slate-600">Bangkit Beruang ecosystem</span>
     </div>
   </footer>
 
   <script>
     let currentMetadata = null;
 
+    // Detect platform from URL input to dynamically update left icon
+    function handleUrlInput() {
+      const val = document.getElementById('urlInput').value.trim();
+      const clearBtn = document.getElementById('clearBtn');
+      const iconContainer = document.getElementById('inputIconContainer');
+
+      if (val) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      if (/youtube\.com|youtu\.be/i.test(val)) {
+        iconContainer.innerHTML = '<svg class="w-5 h-5 text-red-600 transition-transform duration-200 scale-110" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>';
+      } else if (/tiktok\.com/i.test(val)) {
+        iconContainer.innerHTML = '<svg class="w-5 h-5 text-slate-900 transition-transform duration-200 scale-110" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.97-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>';
+      } else if (/instagram\.com/i.test(val)) {
+        iconContainer.innerHTML = '<svg class="w-5 h-5 text-pink-600 transition-transform duration-200 scale-110" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>';
+      } else {
+        iconContainer.innerHTML = '<svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>';
+      }
+    }
+
+    function clearInput() {
+      document.getElementById('urlInput').value = '';
+      handleUrlInput();
+      document.getElementById('urlInput').focus();
+    }
+
+    function setSample(url) {
+      document.getElementById('urlInput').value = url;
+      handleUrlInput();
+      handleFetch();
+    }
+
     async function pasteClipboard() {
+      const pasteLabel = document.getElementById('pasteLabel');
       try {
         const text = await navigator.clipboard.readText();
-        if (text) document.getElementById('urlInput').value = text;
+        if (text) {
+          document.getElementById('urlInput').value = text;
+          handleUrlInput();
+          pasteLabel.innerText = 'Tersalin!';
+          setTimeout(() => { pasteLabel.innerText = 'Paste'; }, 1500);
+        }
       } catch (e) {
-        alert('Gunakan Ctrl+V / Cmd+V untuk menempel.');
+        alert('Gunakan Ctrl+V / Cmd+V untuk menempelkan tautan.');
       }
     }
 
@@ -355,6 +551,7 @@
       const errorBox = document.getElementById('errorBox');
       const errorText = document.getElementById('errorText');
       const mediaCard = document.getElementById('mediaCard');
+      const skeletonCard = document.getElementById('skeletonCard');
       const fetchLabel = document.getElementById('fetchLabel');
       const fetchArrow = document.getElementById('fetchArrow');
       const fetchSpinner = document.getElementById('fetchSpinner');
@@ -366,6 +563,8 @@
       }
 
       errorBox.classList.add('hidden');
+      mediaCard.classList.add('hidden');
+      skeletonCard.classList.remove('hidden');
       fetchLabel.innerText = 'Menganalisis...';
       fetchArrow.classList.add('hidden');
       fetchSpinner.classList.remove('hidden');
@@ -387,7 +586,7 @@
           const thumbUrl = data.thumbnail || '';
           document.getElementById('mediaThumbnail').src = thumbUrl;
           document.getElementById('mediaThumbnailBlur').src = thumbUrl;
-          document.getElementById('platformBadge').innerText = data.platform;
+          document.getElementById('platformBadgeText').innerText = data.platform.toUpperCase();
 
           const orientBadge = document.getElementById('orientationBadge');
           if (data.isVertical) {
@@ -397,12 +596,20 @@
             orientBadge.classList.add('hidden');
           }
 
+          skeletonCard.classList.add('hidden');
           mediaCard.classList.remove('hidden');
+
+          // Save to local history
+          saveToHistory(data, url);
+
+          // Smooth scroll to card
+          mediaCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
           const errData = await res.json().catch(() => ({}));
           throw new Error(errData.error || 'Gagal memproses tautan.');
         }
       } catch (err) {
+        skeletonCard.classList.add('hidden');
         errorBox.classList.remove('hidden');
         errorText.innerText = err.message || 'Gagal menganalisis video. Pastikan link publik dan benar.';
         mediaCard.classList.add('hidden');
@@ -424,16 +631,26 @@
       const lAud = document.getElementById('panelAudio');
 
       if (tab === 'video') {
-        bVid.className = 'flex-1 py-2 rounded-lg glass-tab-active text-slate-950 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2';
-        bAud.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-950 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center justify-center gap-2';
+        bVid.className = 'flex-1 py-2.5 rounded-xl glass-tab-active text-slate-950 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]';
+        bAud.className = 'flex-1 py-2.5 rounded-xl text-slate-600 hover:text-slate-950 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]';
         lVid.classList.remove('hidden');
         lAud.classList.add('hidden');
       } else {
-        bAud.className = 'flex-1 py-2 rounded-lg glass-tab-active text-slate-950 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2';
-        bVid.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-950 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center justify-center gap-2';
+        bAud.className = 'flex-1 py-2.5 rounded-xl glass-tab-active text-slate-950 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]';
+        bVid.className = 'flex-1 py-2.5 rounded-xl text-slate-600 hover:text-slate-950 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]';
         lAud.classList.remove('hidden');
         lVid.classList.add('hidden');
       }
+    }
+
+    function showToast(title, desc) {
+      const toast = document.getElementById('floatingToast');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastDesc').innerText = desc;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 4500);
     }
 
     function triggerDownload(type, quality) {
@@ -441,11 +658,11 @@
 
       const url = document.getElementById('urlInput').value.trim();
       const title = currentMetadata.title;
-      const notice = document.getElementById('statusNotice');
-      const noticeText = document.getElementById('statusNoticeText');
 
-      notice.classList.remove('hidden');
-      noticeText.innerText = 'Menyiapkan ' + type.toUpperCase() + ' (' + quality + ')... Unduhan dimulai otomatis.';
+      showToast(
+        'Memulai Unduhan ' + type.toUpperCase() + ' (' + quality + ')',
+        'File sedang disiapkan. Periksa daftar unduhan di browser Anda.'
+      );
 
       const downloadUrl = '/api/download?url=' + encodeURIComponent(url) + '&type=' + type + '&quality=' + quality + '&title=' + encodeURIComponent(title);
       
@@ -455,11 +672,69 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      setTimeout(() => {
-        notice.classList.add('hidden');
-      }, 5000);
     }
+
+    // Local Storage History Management
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem('donat_history') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveToHistory(item, originalUrl) {
+      let list = getHistory();
+      list = list.filter(h => h.id !== item.id);
+      list.unshift({
+        id: item.id,
+        title: item.title,
+        author: item.author,
+        thumbnail: item.thumbnail,
+        platform: item.platform,
+        url: originalUrl
+      });
+      if (list.length > 4) list = list.slice(0, 4);
+      localStorage.setItem('donat_history', JSON.stringify(list));
+      renderHistory();
+    }
+
+    function clearHistory() {
+      localStorage.removeItem('donat_history');
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const historySection = document.getElementById('historySection');
+      const historyList = document.getElementById('historyList');
+      const list = getHistory();
+
+      if (!list || list.length === 0) {
+        historySection.classList.add('hidden');
+        return;
+      }
+
+      historySection.classList.remove('hidden');
+      historyList.innerHTML = list.map(item => `
+        <div onclick="setSample('${item.url}')" class="p-3 rounded-2xl bg-white/85 hover:bg-white border border-slate-200/80 shadow-2xs hover:shadow-sm transition-all cursor-pointer flex items-center gap-3 group active:scale-[0.98]">
+          <img src="${item.thumbnail || '/logo.png'}" class="w-14 h-10 rounded-lg object-cover bg-slate-900 border border-slate-200/80 shrink-0">
+          <div class="overflow-hidden flex-1">
+            <div class="text-xs font-bold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">${item.title}</div>
+            <div class="text-[11px] text-slate-500 truncate flex items-center gap-1.5 mt-0.5">
+              <span>${item.author || item.platform}</span>
+              <span>•</span>
+              <span class="text-emerald-600 font-semibold">${item.platform}</span>
+            </div>
+          </div>
+          <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </div>
+      `).join('');
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderHistory();
+    });
   </script>
 </body>
 </html>
